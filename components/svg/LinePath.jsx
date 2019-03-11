@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 
-export function LinePath({ chunks, height, width, offset, pathProps, visibleWidth }) {
-  const skipBefore = (100 * (width - offset)) / width;
-  const skipAfter = skipBefore + (100 * visibleWidth) / width;
-  const firstChunkIndex = Math.max(chunks.findIndex(({ x }) => x > skipBefore) - 1, 0);
+export function LinePath({ chunks, height, width, offset, pathProps, visible }) {
+  const skipAfter = offset + visible;
+  const firstChunkIndex = Math.max(chunks.findIndex(({ x }) => x > offset) - 1, 0);
   const lastChunkIndex =
     skipAfter >= 100 ? chunks.length - 1 : Math.min(chunks.findIndex(({ x }) => x >= skipAfter), chunks.length - 1);
   const getValue = useMemo(() => (value, isHeight) => (value * (isHeight ? height : width)) / 100, [
@@ -15,6 +14,15 @@ export function LinePath({ chunks, height, width, offset, pathProps, visibleWidt
   let index = 0;
   let value = [`M${getValue(chunks[firstChunkIndex].x, false)} ${getValue(chunks[firstChunkIndex].y, true)}`];
 
+  console.log('[LinePath]:', {
+    firstChunkIndex,
+    lastChunkIndex,
+    skipAfter,
+    chunks,
+    value,
+    width,
+    border: [offset, skipAfter]
+  });
   for (const { x, y } of chunks) {
     if (index <= firstChunkIndex) {
       index++;

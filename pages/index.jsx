@@ -19,11 +19,11 @@ const dataSets = [['joined', '#31ad3c'], ['left', '#ff5c44']].map(([key, color])
   }))
 }));
 
-const InteractiveChart = dynamic(() => import('~/components/lazy/InteractiveChart'), {
+const InteractiveChart = dynamic(() => import('../components/lazy/InteractiveChart'), {
   loading: () => <div className={style.PlaceholderBlock}/>,
   ssr: false
 });
-const PreviewChart = dynamic(() => import('~/components/lazy/PreviewChart'), {
+const PreviewChart = dynamic(() => import('../components/lazy/PreviewChart'), {
   loading: () => <div className={style.PlaceholderBlock}/>,
   ssr: false
 });
@@ -47,7 +47,7 @@ export default function IndexPage() {
         <Title>Followers</Title>
       </Heading>
       <div className={style.Graph}>
-        <InteractiveChart height={height} dataSets={resultDataSets}/>
+        <InteractiveChart height={height} dataSets={resultDataSets} offset={10} visible={50}/>
       </div>
       <div className={style.Preview}>
         <PreviewChart height={80} dataSets={resultDataSets}/>

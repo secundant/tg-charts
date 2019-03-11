@@ -2,10 +2,10 @@ import * as React from 'react';
 import { useResizeState } from '../../hooks';
 import { Chart } from '../Chart';
 
-export default function InteractiveChart({ dataSets, height }) {
-  const width = useResizeState(() => document.body.offsetWidth);
+export default function InteractiveChart({ dataSets, height, offset, visible }) {
+  const documentWidth = useResizeState(() => document.body.offsetWidth);
 
   return (
-    <Chart width={width} height={height} dataSets={dataSets} offset={0} visibleWidth={width}/>
+    <Chart width={documentWidth} height={height} dataSets={dataSets} offset={offset} visible={visible}/>
   );
 }

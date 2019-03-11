@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { LinePath, SVG } from '../svg';
 
-export function Chart({ offset, height, width, visibleWidth = width, dataSets }) {
+export function Chart({ offset, height, width, visible = width, dataSets }) {
   return (
-    <SVG width={width} height={height} viewBox={`${offset} 0 ${visibleWidth} ${height}`}>
+    <SVG width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
       {dataSets.map(({ color, data, key }) => (
         <LinePath
           chunks={data}
           width={width}
           height={height}
           offset={offset}
-          visibleWidth={visibleWidth}
+          visible={visible}
           key={key}
           pathProps={{
             stroke: color,
