@@ -1,0 +1,22 @@
+@import "../../style";
+
+.Heading {
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: $offset-big;
+    background-image: linear-gradient(to bottom, #fff, #fff, transparent);
+  }
+}
+
+.Title {
+  background-color: #fff;
+  margin: 0;
+  padding: $offset-medium $offset-global-side 0 $offset-global-side;
+  font-size: 22px;
+  font-weight: 500;
+  cursor: text;
+}

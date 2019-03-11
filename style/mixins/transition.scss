@@ -1,0 +1,14 @@
+@import "../functions";
+
+@function get-transition-list($transition-content, $transition-names) {
+  $transition-value: ();
+
+  @each $transition-name in $transition-names {
+    $transition-value: append($transition-value, $transition-name + ' ' + $transition-content, 'comma');
+  }
+  @return $transition-value;
+}
+
+@mixin transition-list($transition-content, $transition-names) {
+  transition: get-transition-list($transition-content, $transition-names);
+}

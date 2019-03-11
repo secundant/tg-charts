@@ -1,0 +1,14 @@
+{
+  "presets": [
+    "@babel/typescript",
+    "next/babel"
+  ],
+  "env": {
+    "production": {
+      "plugins": [
+        "babel-plugin-lodash",
+        "babel-plugin-ramda"
+      ]
+    }
+  }
+}

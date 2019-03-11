@@ -1,0 +1,17 @@
+@mixin element-focused($focused-class-name: focused) {
+  &:not(:disabled) {
+    &:focus,
+    &:hover,
+    &.#{$focused-class-name} {
+      @content;
+    }
+  }
+}
+
+@mixin element-active($active-class-name: active, $focused-class-name: focused) {
+  &:not(:disabled):not(.#{$focused-class-name}) {
+    &:hover:active {
+      @content;
+    }
+  }
+}

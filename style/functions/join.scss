@@ -1,0 +1,14 @@
+@function join-list($values, $separator) {
+  $result: '';
+
+  @each $value in $values {
+    @if $value and str-length($value) > 0 {
+      @if $result {
+        $result: #{$result}#{$separator}#{$value};
+      } @else {
+        $result: $value;
+      }
+    }
+  }
+  @return $result;
+}

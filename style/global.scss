@@ -1,0 +1,9 @@
+@import "config/defaults";
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500');
+
+body {
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-family: get-font-family(Roboto);
+}
