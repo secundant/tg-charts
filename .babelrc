@@ -1,7 +1,19 @@
 {
   "presets": [
-    "@babel/typescript",
     "next/babel"
+  ],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "root": [
+          "."
+        ],
+        "alias": {
+          "~": "."
+        }
+      }
+    ]
   ],
   "env": {
     "production": {

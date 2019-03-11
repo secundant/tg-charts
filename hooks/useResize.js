@@ -1,7 +1,6 @@
-import { F0 } from '~/types';
 import { useEffect } from 'react';
 
-export function useResize(handler: F0) {
+export function useResize(handler) {
   useEffect(() => {
     if (!window) return;
     window.addEventListener('resize', handler, false);
