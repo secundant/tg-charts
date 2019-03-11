@@ -47,7 +47,7 @@ export default function IndexPage() {
         <Title>Followers</Title>
       </Heading>
       <div className={style.Graph}>
-        <InteractiveChart height={height} dataSets={resultDataSets} offset={10} visible={50}/>
+        <InteractiveChart height={height} dataSets={resultDataSets} offset={20} visible={50}/>
       </div>
       <div className={style.Preview}>
         <PreviewChart height={80} dataSets={resultDataSets}/>
