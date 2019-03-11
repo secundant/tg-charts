@@ -2,13 +2,14 @@
 
 .Heading {
   position: relative;
+  margin-bottom: $offset-small;
 
   &::after {
     content: '';
     display: block;
     width: 100%;
-    height: $offset-big;
-    background-image: linear-gradient(to bottom, #fff, #fff, transparent);
+    height: $size-regular;
+    background-image: linear-gradient(to bottom, #fff, #fff 30%, transparent);
   }
 }
 
