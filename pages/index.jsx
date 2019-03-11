@@ -9,7 +9,7 @@ import dynamic from 'next-server/dynamic';
 import { compact } from 'lodash';
 
 const height = 300;
-const itemsCount = 100;
+const itemsCount = 51;
 const dataSets = [['joined', '#31ad3c'], ['left', '#ff5c44']].map(([key, color]) => ({
   key,
   color,

@@ -1,15 +1,14 @@
 import * as React from 'react';
 import style from './Heading.scss';
-import { Props } from '~/types';
-import { baseClassName } from '~/utils';
+import { baseClassName } from '../../utils/dom';
 
 const withHeadingClass = baseClassName(style.Heading);
 const withTitleClass = baseClassName(style.Title);
 
-export function Heading({ className, ...props }: Props<'div'>) {
+export function Heading({ className, ...props }) {
   return <div className={withHeadingClass(className)} {...props} />;
 }
 
-export function Title({ className, ...props }: Props<'h1'>) {
+export function Title({ className, ...props }) {
   return <h1 className={withTitleClass(className)} {...props} />;
 }

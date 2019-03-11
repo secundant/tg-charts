@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "jsx": "preserve",
-    "target": "es6",
-    "skipLibCheck": false,
-    "isolatedModules": false
-  }
-}

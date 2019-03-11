@@ -1,8 +1,7 @@
-import { F0 } from '~/types';
 import { useState } from 'react';
-import { useResize } from '~/hooks';
+import { useResize } from './useResize';
 
-export function useResizeState<T>(next: F0<T>) {
+export function useResizeState(next) {
   const [state, setState] = useState(next());
 
   useResize(() => setState(next()));

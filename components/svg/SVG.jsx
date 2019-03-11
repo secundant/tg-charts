@@ -1,10 +1,7 @@
 import * as React from 'react';
-import { SVGAttributes } from 'react';
 
-export function SVG(props: SVGAttributes<SVGSVGElement>) {
-  return (
-    <svg {...props} />
-  )
+export function SVG(props) {
+  return <svg {...props} />;
 }
 
 SVG.defaultProps = {
