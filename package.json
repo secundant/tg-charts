@@ -35,14 +35,11 @@
     "ramda": "^0.26.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "sanitize.css": "^8.0.0",
-    "tslib": "^1.9.3"
+    "sanitize.css": "^8.0.0"
   },
   "scripts": {
-    "lint:base": "tslint -c tslint.json -p tsconfig.json",
-    "lint": "yarn lint:base packages/**/*.{ts,tsx}",
     "pre-commit": "lint-staged",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint --fix",
     "start-server": "next start",
     "start": "next",
     "build": "next build",
@@ -51,7 +48,6 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
-      "pre-push": "yarn typecheck",
       "post-commit": "git update-index --again"
     }
   }
