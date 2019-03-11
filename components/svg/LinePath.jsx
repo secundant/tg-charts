@@ -10,28 +10,34 @@ export function LinePath({ chunks, height, width, offset, pathProps, visible }) 
     width,
     height
   ]);
+  const relativeWidth = chunks[lastChunkIndex].x - chunks[firstChunkIndex].x;
+  const absoluteWidth = (width / (relativeWidth / 100)) / 100;
+  const offsetWidth = offset * absoluteWidth;
 
   let index = 0;
-  let value = [`M${getValue(chunks[firstChunkIndex].x, false)} ${getValue(chunks[firstChunkIndex].y, true)}`];
+  let value = [`M${offsetWidth - getValue(chunks[firstChunkIndex].x, false)} ${getValue(chunks[firstChunkIndex].y, true)}`];
 
-  console.log('[LinePath]:', {
-    firstChunkIndex,
-    lastChunkIndex,
-    skipAfter,
-    chunks,
-    value,
-    width,
-    border: [offset, skipAfter]
-  });
   for (const { x, y } of chunks) {
     if (index <= firstChunkIndex) {
       index++;
       continue;
     }
     if (index > lastChunkIndex) break;
-    value.push(`L ${getValue(x)} ${getValue(y, true)}`);
+    value.push(`L ${(x * absoluteWidth) - offsetWidth} ${getValue(y, true)}`);
     index++;
   }
 
+  console.log('[LinePath]:', {
+    firstChunkIndex,
+    lastChunkIndex,
+    absoluteWidth,
+    relativeWidth,
+    skipAfter,
+    offsetWidth,
+    chunks,
+    value,
+    width,
+    border: [offset, skipAfter]
+  });
   return <path d={value.join(' ')} fill="transparent" {...pathProps} />;
 }
