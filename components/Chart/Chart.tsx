@@ -15,7 +15,8 @@ export function Chart({ offset, height, width, visibleWidth = width, dataSets }:
           pathProps={{
             stroke: color,
             strokeWidth: 2
-          }}
+            // TODO remove ts/fix types
+          } as any}
         />
       ))}
     </SVG>
