@@ -6,7 +6,7 @@ export const joinClassNames = pipe(
   compact,
   join(' ')
 );
-export const cn = joinClassNames;
+export const cn = (...classNames) => joinClassNames(classNames);
 
 export const baseClassName = (...classNames) => {
   const className = cn(classNames);

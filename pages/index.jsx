@@ -7,6 +7,7 @@ import style from './index.scss';
 import Head from 'next-server/head';
 import dynamic from 'next-server/dynamic';
 import { compact } from 'lodash';
+import { useShallowState } from '../hooks/useShallowState';
 
 const height = 300;
 const itemsCount = 51;
@@ -33,6 +34,13 @@ export default function IndexPage() {
   const [checked2, setChecked2] = useState(false);
   const toggleChecked = useCallback(() => setChecked(!checked), [checked]);
   const toggleChecked2 = useCallback(() => setChecked2(!checked2), [checked2]);
+  const [{
+    offset,
+    visible
+  }, setState] = useShallowState({
+    offset: 30,
+    visible: 20
+  });
   const resultDataSets = compact([
     checked && dataSets[0],
     checked2 && dataSets[1]
@@ -47,10 +55,10 @@ export default function IndexPage() {
         <Title>Followers</Title>
       </Heading>
       <div className={style.Graph}>
-        <InteractiveChart height={height} dataSets={resultDataSets} offset={20} visible={50}/>
+        <InteractiveChart height={height} dataSets={resultDataSets} offset={offset} visible={visible}/>
       </div>
       <div className={style.Preview}>
-        <PreviewChart height={80} dataSets={resultDataSets}/>
+        <PreviewChart height={80} dataSets={resultDataSets} offset={offset} visible={visible} onChange={setState}/>
       </div>
       <ButtonsGroup className={style.ButtonsGroup}>
         <Button onClick={toggleChecked} checked={checked} statusColor="#31ad3c">
