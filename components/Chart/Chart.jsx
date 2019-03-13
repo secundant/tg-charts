@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { LinePath, SVG } from '../svg';
 
-export function Chart({ offset, height, width, visible = width, dataSets }) {
+export const Chart = React.memo(({ offset, height, width, visible = width, dataSets }) => {
   return (
     <SVG width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
       {dataSets.map(({ color, data, key }) => (
@@ -21,8 +21,9 @@ export function Chart({ offset, height, width, visible = width, dataSets }) {
       ))}
     </SVG>
   );
-}
+});
 
+Chart.displayName = `memo(Chart)`;
 Chart.defaultProps = {
   offset: 0
 };

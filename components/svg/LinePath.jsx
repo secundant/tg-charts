@@ -1,10 +1,11 @@
-import * as React from 'react';
+import React, { useMemo, useRef } from 'react';
 
 /*
   width - ширина svg элемента
   visible - ширина (0-100)
  */
-export function LinePath({ chunks, height, width, offset, pathProps, visible }) {
+export const LinePath = React.memo(({ chunks, height, width, offset, pathProps, visible }) => {
+  const n = performance.now();
   const scaleWidthRatio = 1 / (visible / 100);
   const scaledWidth = width * scaleWidthRatio;
   const offsetWidth = scaledWidth * offset / 100;
@@ -14,8 +15,8 @@ export function LinePath({ chunks, height, width, offset, pathProps, visible }) 
   const lastChunkIndex =
     skipAfter >= 100 ? chunks.length - 1 : Math.min(chunks.findIndex(({ x }) => x >= skipAfter), chunks.length - 1);
 
-  const _x = v => scaledWidth * v / 100;
-  const _y = v => height * v / 100;
+  const _x = v => Math.round(scaledWidth * v / 100);
+  const _y = v => Math.round(height * v / 100);
 
   const absoluteSkewX = _x(chunks[firstChunkIndex].x) - offsetWidth;
 
@@ -31,7 +32,13 @@ export function LinePath({ chunks, height, width, offset, pathProps, visible }) 
     value.push(`L ${_x(x) - offsetWidth} ${_y(y)}`);
     index++;
   }
+  const path = useRef(null);
+  const nextD = value.join(' ');
+  const initialD = useMemo(() => nextD, [width, chunks]);
 
+  if (path.current) {
+    path.current.setAttribute('d', nextD);
+  }
   /*console.log('[LinePath]:', {
     firstChunkIndex,
     lastChunkIndex,
@@ -46,5 +53,8 @@ export function LinePath({ chunks, height, width, offset, pathProps, visible }) 
     border: [offset, skipAfter],
     firstElementX: _x(chunks[firstChunkIndex].x)
   });*/
-  return <path d={value.join(' ')} fill="transparent" {...pathProps} />;
-}
+  console.log('path:', performance.now() - n);
+  return <path ref={path} d={initialD} fill="transparent" {...pathProps} />;
+});
+
+LinePath.displayName = `memo(LinePath)`;
