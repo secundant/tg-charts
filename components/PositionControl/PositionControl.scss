@@ -9,6 +9,7 @@ $control-color: rgba($color-ui-active, .5);
   right: 0;
   bottom: 0;
   z-index: 1;
+  user-select: none;
 }
 
 .Backdrop {
