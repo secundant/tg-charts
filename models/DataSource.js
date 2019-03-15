@@ -1,8 +1,10 @@
 import { ExtendedDate } from './ExtendedDate';
 import { DataSet } from './DataSet';
+import { Events } from './Events';
 
-export class DataSource {
+export class DataSource extends Events {
   constructor({ columns, colors, types, names }) {
+    super();
     const columnByName = createColumnsDictionary(columns);
     const dataNames = Object.keys(types);
 
@@ -16,18 +18,28 @@ export class DataSource {
     }
     for (const name of dataNames) {
       if (types[name] !== 'line') continue;
-      this.names.push(name);
-      this.dataSets.set(
+      const dataSet = new DataSet({
         name,
-        new DataSet({
-          name,
-          data: columnByName[name],
-          title: names[name],
-          color: colors[name],
-          length: this.length
-        })
-      );
+        data: columnByName[name],
+        title: names[name],
+        color: colors[name],
+        length: this.length
+      });
+
+      this.names.push(name);
+      this.dataSets.set(name, dataSet);
+      dataSet.on('disabledChange', value => this.emit('disabledChange', name, value));
     }
+  }
+
+  get(name) {
+    return this.dataSets.get(name);
+  }
+
+  indexAt(relative) {
+    if (relative <= 0) return 0;
+    if (relative >= 100) return this.length - 1;
+    return Math.ceil((relative * this.length) / 100) - 1;
   }
 }
 

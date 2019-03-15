@@ -8,7 +8,7 @@ export function createButtonsGroup(children) {
     {
       class: `${style.Group} ${rootStyle.ButtonsGroup}`
     },
-    ...children
+    children
   );
 }
 
@@ -21,20 +21,24 @@ export function createButton({ color, title }) {
     {
       class: style.Button
     },
-    el(
-      'div',
-      {
-        class: style.Status,
-        style: `background-color: ${color}`
-      },
-      el('div', {
-        class: style.Circle
-      }),
-      el('div', {
-        class: style.Check
-      })
-    ),
-    label
+    [
+      el(
+        'div',
+        {
+          class: style.Status,
+          style: `background-color: ${color}`
+        },
+        [
+          el('div', {
+            class: style.Circle
+          }),
+          el('div', {
+            class: style.Check
+          })
+        ]
+      ),
+      label
+    ]
   );
 
   label.textContent = title;

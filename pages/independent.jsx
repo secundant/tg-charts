@@ -4,16 +4,14 @@ import style from './index.scss';
 import { Page } from '../components/layout/Page';
 import Head from 'next-server/head';
 import { Heading, Title } from '../components/Heading';
-import { ChartRoot } from '../vanilla/ChartRoot';
-import { DataSource } from '../models/DataSource';
 import Link from 'next/link';
+import { RootView } from '../views';
 
 function renderChart(target) {
   if (!target) return;
-  new ChartRoot({
-    dataSource: new DataSource(input[0]),
-    target
-  }).render();
+  const root = new RootView(input[4]);
+
+  root.renderTo(target);
 }
 
 const IndependentPage = React.memo(() => {
