@@ -1,0 +1,47 @@
+@import "../../style";
+
+$control-color: rgba($color-ui-active, .5);
+
+.Root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  user-select: none;
+}
+
+.Backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: rgba($color-ui-active, .2);
+
+  &.left {
+    left: 0;
+  }
+
+  &.right {
+    right: 0;
+  }
+}
+
+.Group {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-between;
+  height: 100%;
+  background-color: transparent;
+  border: 1px solid $control-color;
+}
+
+.ResizeControl {
+  width: $size-tiny;
+  height: 100%;
+  background-color: $control-color;
+}
