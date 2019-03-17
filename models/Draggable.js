@@ -48,7 +48,7 @@ export class Draggable extends Events {
 
   createStart(element) {
     return event => {
-      if (this.initial) return;
+      if (this.element) return;
       event.stopImmediatePropagation();
       this.element = element;
       this.pageX = getPageX(event);
@@ -60,6 +60,7 @@ export class Draggable extends Events {
   }
 
   reset() {
+    this.lastPageX = null;
     this.element = null;
     this.pageX = null;
     this.diff = null;

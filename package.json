@@ -5,6 +5,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
     "@now/next": "0.0.84",
     "@types/lodash": "^4.14.123",
     "@types/next": "^8.0.1",
@@ -27,7 +28,14 @@
     "next-compose-plugins": "^2.1.1",
     "next-progressbar": "^1.0.0",
     "node-sass": "^4.11.0",
-    "prettier": "^1.16.4"
+    "prepack": "^0.2.54",
+    "prettier": "^1.16.4",
+    "rollup": "^1.6.0",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-postcss": "^2.0.3",
+    "rollup-plugin-terser": "^4.0.4"
   },
   "dependencies": {
     "lodash": "^4.17.11",
@@ -43,7 +51,8 @@
     "start-server": "next start",
     "start": "next",
     "build": "next build",
-    "now-build": "next build"
+    "now-build": "next build",
+    "build:rollup": "rollup --config"
   },
   "husky": {
     "hooks": {

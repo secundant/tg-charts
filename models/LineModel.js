@@ -19,7 +19,7 @@ export class LineModel extends Events {
   }
 
   update() {
-    console.group('[LineModel.update()]');
+    if (this.dataSet.disabled) return;
     const t = performance.now();
     const { firstIndex, lastIndex, initialXPosition } = this.viewBox.computed;
 

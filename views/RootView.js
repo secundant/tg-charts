@@ -1,9 +1,9 @@
 import { DataSource, Draggable, ScreenModel, ViewBoxModel } from '../models';
 import { el } from '../utils/dom/createElement';
-import style from '../vanilla/style.scss';
 import { createButton, createButtonsGroupElement } from './createButton';
 import { SVGCanvasView } from './SVGCanvasView';
 import { PositionControlView } from './PositionControlView';
+import { OFFSET_GLOBAL_SIDE, styles } from '../utils/dom';
 
 export class RootView {
   constructor(dataSource) {
@@ -13,7 +13,7 @@ export class RootView {
     this.viewBox = new ViewBoxModel({
       dataSource: this.dataSource,
       screen: this.screen,
-      height: 360
+      height: 280
     });
     this.previewViewBox = new ViewBoxModel({
       dataSource: this.dataSource,
@@ -36,18 +36,16 @@ export class RootView {
       viewBox: this.viewBox
     });
     this.mainChartElement = el('div', {
-      class: style.Graph
+      style: style.graph
     });
     this.previewChartElement = el('div', {
-      class: style.Preview
+      style: style.preview
     });
     this.mainCanvasView.renderTo(this.mainChartElement);
     this.previewCanvasView.renderTo(this.previewChartElement);
     this.positionControlView.renderTo(this.previewChartElement);
     this.buttonsGroupElement = createButtonsGroupElement();
     this.dataSource.dataSets.forEach(dataSet => this.buttonsGroupElement.appendChild(createButton(dataSet)));
-
-    console.log('new E');
   }
 
   renderTo(element) {
@@ -62,3 +60,15 @@ export class RootView {
     });
   }
 }
+
+const style = styles({
+  graph: {
+    height: '280px',
+    'margin-bottom': OFFSET_GLOBAL_SIDE
+  },
+  preview: {
+    height: '60px',
+    'margin-bottom': OFFSET_GLOBAL_SIDE,
+    position: 'relative'
+  }
+});

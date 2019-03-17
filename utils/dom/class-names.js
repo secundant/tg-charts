@@ -1,5 +1,4 @@
-import { compact, flatten } from 'lodash';
-import { join, pipe } from 'ramda';
+import { compact, flatten, join, pipe } from '../fn';
 
 export const joinClassNames = pipe(
   flatten,

@@ -3,7 +3,7 @@ import { Events } from './Events';
 export class ScreenModel extends Events {
   constructor() {
     super();
-    this.update();
+    this.width = document.body.offsetWidth;
     window.addEventListener('resize', this.update.bind(this), false);
   }
 
