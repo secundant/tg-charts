@@ -1,4 +1,3 @@
 import { RootView } from './views';
-import input from './models/input.json';
 
-new RootView(input[4]).renderTo(document.getElementById('root'));
+new RootView({}).renderTo(document.getElementById('root'));

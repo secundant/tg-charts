@@ -1,4 +1,4 @@
-import { DataSource, Draggable, Renderer, ScreenModel, ViewBoxModel } from '../models';
+import { DataSource, Draggable, Renderer, ScreenModel, Transition, ViewBoxModel } from '../models';
 import { el } from '../utils/dom/createElement';
 import { createButton, createButtonsGroupElement } from './createButton';
 import { SVGCanvasView } from './SVGCanvasView';
@@ -8,6 +8,7 @@ import style from '../vanilla/style.scss';
 export class RootView {
   constructor(dataSource) {
     this.renderer = new Renderer();
+    this.transition = new Transition();
     this.screen = new ScreenModel();
     this.dataSource = new DataSource(dataSource);
     this.draggable = new Draggable();
@@ -15,7 +16,8 @@ export class RootView {
       dataSource: this.dataSource,
       screen: this.screen,
       height: 280,
-      padding: 10
+      padding: 10,
+      transition: this.transition
     });
     this.previewViewBox = new ViewBoxModel({
       dataSource: this.dataSource,
@@ -23,7 +25,8 @@ export class RootView {
       height: 60,
       offset: 0,
       visible: 100,
-      padding: 4
+      padding: 4,
+      transition: this.transition
     });
     this.mainCanvasView = new SVGCanvasView({
       viewBox: this.viewBox,

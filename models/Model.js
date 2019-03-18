@@ -4,13 +4,15 @@ export class Model {
    */
   constructor(dependencies = []) {
     const send = observer => observer();
+    const emit = () => this.observers.forEach(send);
     const next = () => {
       this.update();
-      this.observers.forEach(send);
+      emit();
     };
 
     this.observers = new Set();
     this.next = next;
+    this.emit = emit;
     dependencies.forEach(dependency => dependency.subscribe(next));
   }
 

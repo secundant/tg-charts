@@ -20,6 +20,7 @@ export class LineView {
       fill: 'transparent',
       'stroke-width': strokeWidth
     });
+    this.prevMax = line.viewBox.max;
     this.renderer = renderer;
     this.line = line;
     this.line.subscribe(this.update);
