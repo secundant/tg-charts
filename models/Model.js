@@ -1,19 +1,17 @@
 export class Model {
   /**
-   * @param {Model[]} dependencies
+   * @param {Model[]?} dependencies
    */
   constructor(dependencies = []) {
-    this.change = this.change.bind(this);
-    this.observers = new Set();
-    for (const dependency of dependencies) {
-      dependency.subscribe(this.change);
-    }
-    this.value = this.update();
-  }
+    const send = observer => observer();
+    const next = () => {
+      this.update();
+      this.observers.forEach(send);
+    };
 
-  change() {
-    this.value = this.update();
-    this.observers.forEach(observer => observer(this.value));
+    this.observers = new Set();
+    this.next = next;
+    dependencies.forEach(dependency => dependency.subscribe(next));
   }
 
   update() {

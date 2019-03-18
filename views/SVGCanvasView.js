@@ -3,17 +3,18 @@ import { LineView } from './LineView';
 import { elNS } from '../utils/dom/createElement';
 
 export class SVGCanvasView {
-  handleDisabledChange = (name, disabled) => {
-    const lineView = this.lineViews.get(name);
+  handleDisabledChange = () => {
+    const dataSet = this.dataSource.last;
+    const lineView = this.lineViews.get(dataSet.name);
 
-    if (disabled) {
+    if (dataSet.disabled) {
       this.svg.removeChild(lineView.element);
     } else {
       lineView.renderTo(this.svg);
     }
   };
   update = () => {
-    const { width, height } = this.viewBox.state;
+    const { screen: { width }, height } = this.viewBox;
 
     if (width !== this.width) {
       this.width = width;
@@ -22,12 +23,17 @@ export class SVGCanvasView {
     }
   };
 
+  /**
+   * @param {DataSource} dataSource
+   * @param {ViewBoxModel} viewBox
+   * @param {number} strokeWidth
+   */
   constructor({ dataSource, viewBox, strokeWidth = 2 }) {
     this.svg = elNS(['http://www.w3.org/2000/svg', 'svg'], {
       version: '1.1',
       baseProfile: 'full',
-      width: viewBox.state.width,
-      height: viewBox.state.height,
+      width: viewBox.screen.width,
+      height: viewBox.height,
       preserveAspectRatio: 'none'
     });
     this.width = null;
@@ -49,8 +55,8 @@ export class SVGCanvasView {
       }
       this.lineViews.set(dataSet.name, lineView);
     });
-    this.dataSource.on('disabledChange', this.handleDisabledChange);
-    this.viewBox.on('change', this.update);
+    this.dataSource.subscribe(this.handleDisabledChange);
+    this.viewBox.subscribe(this.update);
     this.update();
   }
 

@@ -1,36 +1,41 @@
-import { Events } from './Events';
-import { createLog } from '../utils/createLog';
+import { Model } from './Model';
 
-export class ViewBoxModel extends Events {
+export class ViewBoxModel extends Model {
   x = index => Math.round(this.computed.spaceBetween * index - this.computed.offsetWidth);
+  y = value => this.padding + Math.round(this.innerHeight - (this.innerHeight * value) / this.computed.maxValue);
 
-  constructor({ screen, height, visible = 30, offset = 60, dataSource }) {
-    super();
-    this.state = {
-      visible,
-      offset,
-      height,
-      width: screen.width
-    };
+  /**
+   * @param {ScreenModel} screen
+   * @param {Number} height
+   * @param {Number?} visible
+   * @param {Number?} offset
+   * @param {DataSource} dataSource
+   * @param {number} padding
+   */
+  constructor({ screen, height, visible = 30, offset = 60, dataSource, padding }) {
+    super([screen, dataSource]);
+    this.height = height;
+    this.offset = offset;
+    this.visible = visible;
     this.dataSource = dataSource;
     this.screen = screen;
-    this.screen.on('change', width => {
-      this.state.width = screen.width;
-      this.update();
-    });
+    this.padding = padding;
+    this.innerHeight = height - padding * 2;
     this.update();
   }
 
-  set({ offset = this.state.offset, visible = this.state.visible }) {
-    if (offset === this.state.offset && visible === this.state.visible) return;
-    this.state.offset = offset;
-    this.state.visible = visible;
-    this.update();
+  set({ offset = this.offset, visible = this.visible }) {
+    this.offset = offset;
+    this.visible = visible;
+    this.next();
   }
 
   update() {
-    const log = createLog('ViewBoxModel');
-    const { width, offset, visible } = this.state;
+    const {
+      offset,
+      visible,
+      screen: { width }
+    } = this;
     const scaledWidthRatio = 1 / (visible / 100);
     const scaledWidth = width * scaledWidthRatio;
     const offsetWidth = (scaledWidth * offset) / 100;
@@ -39,6 +44,11 @@ export class ViewBoxModel extends Events {
     const visibleCount = lastIndex - firstIndex;
     const spaceBetween = scaledWidth / (this.dataSource.length - 1);
     const initialXPosition = Math.round(spaceBetween * firstIndex - offsetWidth);
+    const maxValue = Math.max(
+      ...Array.from(this.dataSource.dataSets.values()).map(dataSet =>
+        dataSet.disabled ? 0 : Math.max(...dataSet.subset(firstIndex, lastIndex + 1))
+      )
+    );
 
     this.computed = {
       scaledWidthRatio,
@@ -48,11 +58,8 @@ export class ViewBoxModel extends Events {
       scaledWidth,
       offsetWidth,
       firstIndex,
-      lastIndex
+      lastIndex,
+      maxValue
     };
-
-    log.markSelf();
-    this.emit('change', this.computed, this.screen);
-    log.end();
   }
 }

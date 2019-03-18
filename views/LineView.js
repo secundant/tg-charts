@@ -14,7 +14,7 @@ export class LineView {
     });
     this.isPending = false;
     this.line = line;
-    this.line.on('change', () => {
+    this.line.subscribe(() => {
       if (this.isPending) return;
       this.isPending = true;
       requestAnimationFrame(this.update);

@@ -2,6 +2,10 @@ import style from '../components/PositionControl/PositionControl.scss';
 import { el } from '../utils/dom/createElement';
 
 export class PositionControlView {
+  /**
+   * @param {ViewBoxModel} viewBox
+   * @param {Draggable} draggable
+   */
   constructor({ viewBox, draggable }) {
     this.viewBox = viewBox;
     this.draggable = draggable;
@@ -32,7 +36,7 @@ export class PositionControlView {
       [this.leftBackdropElement, this.controlsGroupElement, this.rightBackdropElement]
     );
 
-    this.viewBox.on('change', this.update.bind(this));
+    this.viewBox.subscribe(this.update.bind(this));
     this.draggable.subscribe(this.leftControlElement, this.handleLeft.bind(this));
     this.draggable.subscribe(this.rightControlElement, this.handleRight.bind(this));
     this.draggable.subscribe(this.controlsGroupElement, this.handleGroup.bind(this));
@@ -45,7 +49,7 @@ export class PositionControlView {
       this.initialLeft = this.controlWidth;
       return;
     }
-    const { width, visible, offset } = this.viewBox.state;
+    const { screen: { width }, visible, offset } = this.viewBox;
     const nextControlWidth = Math.min(Math.max(this.initialLeft - x, 48), (width * (offset + visible)) / 100);
     const diff = ((nextControlWidth - this.controlWidth) * 100) / width;
 
@@ -61,7 +65,7 @@ export class PositionControlView {
       this.initialRight = this.controlWidth;
       return;
     }
-    const { width } = this.viewBox.state;
+    const { width } = this.viewBox.screen;
     const nextWidth = Math.min(Math.max(this.initialRight + x, 48), width - this.offsetLeft);
 
     this.viewBox.set({
@@ -71,7 +75,7 @@ export class PositionControlView {
 
   handleGroup(type, _, x) {
     if (type === 'end' || type === 'start') return;
-    const { visible, width } = this.viewBox.state;
+    const { visible, screen: { width } } = this.viewBox;
     const nextOffsetLeft = Math.max(Math.min(this.offsetLeft + x, (width * (100 - visible)) / 100), 0);
 
     this.viewBox.set({
@@ -80,7 +84,7 @@ export class PositionControlView {
   }
 
   update() {
-    const { width, visible, offset } = this.viewBox.state;
+    const { screen: { width }, visible, offset } = this.viewBox;
 
     this.controlWidth = (width * visible) / 100;
     this.offsetLeft = (width * offset) / 100;

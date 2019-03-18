@@ -1,14 +1,13 @@
-import { Events } from './Events';
+import { Model } from './Model';
 
-export class ScreenModel extends Events {
+export class ScreenModel extends Model {
   constructor() {
     super();
-    this.width = document.body.offsetWidth;
-    window.addEventListener('resize', this.update.bind(this), false);
+    window.addEventListener('resize', this.next, false);
+    this.update();
   }
 
   update() {
     this.width = document.body.offsetWidth;
-    this.emit('change', this.width);
   }
 }

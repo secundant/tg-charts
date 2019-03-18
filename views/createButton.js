@@ -8,8 +8,11 @@ export function createButtonsGroupElement() {
   });
 }
 
+/**
+ * @param {DataSet} dataSet
+ */
 export function createButton(dataSet) {
-  const { color, title, disabled } = dataSet;
+  const { color, title } = dataSet;
 
   const label = el('div', {
     class: style.Label
@@ -17,7 +20,7 @@ export function createButton(dataSet) {
   const element = el(
     'button',
     {
-      class: disabled ? style.Button : `${style.Button} ${style.checked}`
+      class: `${style.Button} ${style.checked}`
     },
     [
       el(
@@ -40,7 +43,7 @@ export function createButton(dataSet) {
   );
 
   label.textContent = title;
-  dataSet.on('disabledChange', value => element.classList[!value ? 'add' : 'remove'](style.checked));
-  element.addEventListener('click', () => dataSet.setDisabled(!dataSet.disabled), false);
+  dataSet.subscribe(() => element.classList[!dataSet.disabled ? 'add' : 'remove'](style.checked));
+  element.addEventListener('click', () => dataSet.set(!dataSet.disabled), false);
   return element;
 }

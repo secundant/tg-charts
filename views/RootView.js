@@ -3,7 +3,7 @@ import { el } from '../utils/dom/createElement';
 import { createButton, createButtonsGroupElement } from './createButton';
 import { SVGCanvasView } from './SVGCanvasView';
 import { PositionControlView } from './PositionControlView';
-import { OFFSET_GLOBAL_SIDE, styles } from '../utils/dom';
+import style from '../vanilla/style.scss';
 
 export class RootView {
   constructor(dataSource) {
@@ -13,14 +13,16 @@ export class RootView {
     this.viewBox = new ViewBoxModel({
       dataSource: this.dataSource,
       screen: this.screen,
-      height: 280
+      height: 280,
+      padding: 10
     });
     this.previewViewBox = new ViewBoxModel({
       dataSource: this.dataSource,
       screen: this.screen,
       height: 60,
       offset: 0,
-      visible: 100
+      visible: 100,
+      padding: 4
     });
     this.mainCanvasView = new SVGCanvasView({
       viewBox: this.viewBox,
@@ -36,10 +38,10 @@ export class RootView {
       viewBox: this.viewBox
     });
     this.mainChartElement = el('div', {
-      style: style.graph
+      class: style.Graph
     });
     this.previewChartElement = el('div', {
-      style: style.preview
+      class: style.Preview
     });
     this.mainCanvasView.renderTo(this.mainChartElement);
     this.previewCanvasView.renderTo(this.previewChartElement);
@@ -60,15 +62,3 @@ export class RootView {
     });
   }
 }
-
-const style = styles({
-  graph: {
-    height: '280px',
-    'margin-bottom': OFFSET_GLOBAL_SIDE
-  },
-  preview: {
-    height: '60px',
-    'margin-bottom': OFFSET_GLOBAL_SIDE,
-    position: 'relative'
-  }
-});
