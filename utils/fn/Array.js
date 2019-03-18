@@ -1,16 +1,10 @@
-/**
- * @param {* | *[]} value
- * @returns {*[]}
- */
-export const toArray = value => Array.isArray(value) ? value : [value];
-export const compact = value => value ? value.filter(isTrueLike) : [];
-export const isFalseLike = value => !value;
-export const isTrueLike = value => !!value;
-export const flatten = list => list.reduce((result, item) => {
-  if (Array.isArray(item)) {
-    list.push(...flatten(item));
-  } else {
-    list.push(item);
-  }
-  return result;
-}, []);
+export const toArray = val => (Array.isArray(val) ? val : [val]);
+
+export const isTruthy = val => !!val;
+
+export const isFalsy = val => !val;
+
+export const compact = (arr = []) => arr.filter(isTruthy);
+
+export const flatten = (list = []) =>
+  list.reduce((acc, item) => acc.concat(Array.isArray(item) ? flatten(item) : item), []);

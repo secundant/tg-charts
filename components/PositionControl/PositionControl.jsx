@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 import style from './PositionControl.scss';
-import { cn } from '../../utils/dom';
 import { useHorizontalDrag } from '../../hooks/useHorizontalDrag';
 
 export function PositionControl({ offset, visible, width, onChange }) {
@@ -59,7 +58,7 @@ export function PositionControl({ offset, visible, width, onChange }) {
   return (
     <div className={style.Root}>
       <div
-        className={cn(style.Backdrop, style.left)}
+        className={`${style.Backdrop} ${style.left}`}
         style={{
           width: offsetLeft
         }}
@@ -76,7 +75,7 @@ export function PositionControl({ offset, visible, width, onChange }) {
         <div className={style.ResizeControl} {...rightDrag()} />
       </div>
       <div
-        className={cn(style.Backdrop, style.right)}
+        className={`${style.Backdrop} ${style.right}`}
         style={{
           width: offsetRight,
           left: offsetLeft + controlWidth

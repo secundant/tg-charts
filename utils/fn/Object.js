@@ -1,1 +1,1 @@
-export const keys = value => Object.keys(value);
+export const keys = (obj = {}) => Object.keys(obj);

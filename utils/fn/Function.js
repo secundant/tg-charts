@@ -1,2 +1,4 @@
 export const identity = v => v;
-export const pipe = (...fns) => value => fns.reduce((result, fn) => fn(result), value);
+
+export const pipe = (...fns) => val =>
+  fns.reduce((acc, fn) => fn(acc), val);
