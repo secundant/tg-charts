@@ -5,9 +5,12 @@ export class PositionControlView {
   /**
    * @param {ViewBoxModel} viewBox
    * @param {Draggable} draggable
+   * @param {Renderer} renderer
    */
-  constructor({ viewBox, draggable }) {
+  constructor({ viewBox, draggable, renderer }) {
+    this._id = `position-control-${performance.now()}-${Math.random()}`;
     this.viewBox = viewBox;
+    this.renderer = renderer;
     this.draggable = draggable;
     this.leftBackdropElement = el('div', {
       class: style.Backdrop + ' ' + style.left
@@ -36,6 +39,7 @@ export class PositionControlView {
       [this.leftBackdropElement, this.controlsGroupElement, this.rightBackdropElement]
     );
 
+    this.paint = this.paint.bind(this);
     this.viewBox.subscribe(this.update.bind(this));
     this.draggable.subscribe(this.leftControlElement, this.handleLeft.bind(this));
     this.draggable.subscribe(this.rightControlElement, this.handleRight.bind(this));
@@ -89,7 +93,10 @@ export class PositionControlView {
     this.controlWidth = (width * visible) / 100;
     this.offsetLeft = (width * offset) / 100;
     this.offsetRight = width - (this.controlWidth + this.offsetLeft);
+    this.renderer.set(this._id, this.paint);
+  }
 
+  paint() {
     this.leftBackdropElement.style.width = `${this.offsetLeft}px`;
 
     this.rightBackdropElement.style.width = `${this.offsetRight}px`;

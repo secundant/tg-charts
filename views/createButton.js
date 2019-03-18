@@ -10,9 +10,11 @@ export function createButtonsGroupElement() {
 
 /**
  * @param {DataSet} dataSet
+ * @param {Renderer} renderer
  */
-export function createButton(dataSet) {
+export function createButton(dataSet, renderer) {
   const { color, title } = dataSet;
+  const _id = `button-${dataSet.name}-${Math.random()}`;
 
   const label = el('div', {
     class: style.Label
@@ -41,9 +43,11 @@ export function createButton(dataSet) {
       label
     ]
   );
+  const paint = () => element.classList[!dataSet.disabled ? 'add' : 'remove'](style.checked);
+  const update = () => renderer.set(_id, paint);
 
   label.textContent = title;
-  dataSet.subscribe(() => element.classList[!dataSet.disabled ? 'add' : 'remove'](style.checked));
+  dataSet.subscribe(update);
   element.addEventListener('click', () => dataSet.set(!dataSet.disabled), false);
   return element;
 }

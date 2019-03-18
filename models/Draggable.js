@@ -2,26 +2,6 @@ import { Events } from './Events';
 import { subscribeToEvents } from '../utils/dom';
 
 export class Draggable extends Events {
-  change = event => {
-    if (!this.element) return;
-    const nextPageX = getPageX(event);
-    const lastDiff = nextPageX - this.lastPageX;
-
-    this.lastPageX = nextPageX;
-    this.diff = nextPageX - this.pageX;
-    this.emit('change', this.element, this.diff, lastDiff);
-    this.elementObservers.get(this.element)('change', this.diff, lastDiff);
-  };
-  end = event => {
-    if (!this.element) return;
-    if (event.type === 'touchend' && event.targetTouches.length > 0) {
-      return;
-    }
-    this.emit('end', this.element);
-    this.elementObservers.get(this.element)('end');
-    this.reset();
-  };
-
   constructor() {
     super();
     subscribeToEvents(document, {
@@ -46,6 +26,26 @@ export class Draggable extends Events {
     });
   }
 
+  change = event => {
+    if (!this.element) return;
+    const nextPageX = getPageX(event);
+    const lastDiff = nextPageX - this.lastPageX;
+
+    this.lastPageX = nextPageX;
+    this.diff = nextPageX - this.pageX;
+    this.emit('change', this.element, this.diff, lastDiff);
+    this.elementObservers.get(this.element)('change', this.diff, lastDiff);
+  };
+  end = event => {
+    if (!this.element) return;
+    if (event.type === 'touchend' && event.targetTouches.length > 0) {
+      return;
+    }
+    this.emit('end', this.element);
+    this.elementObservers.get(this.element)('end');
+    this.reset();
+  };
+
   createStart(element) {
     return event => {
       if (this.element) return;
@@ -56,6 +56,9 @@ export class Draggable extends Events {
       this.diff = 0;
       this.emit('start', element);
       this.elementObservers.get(this.element)('start');
+      if (event.type === 'touchstart') {
+        event.preventDefault();
+      }
     };
   }
 

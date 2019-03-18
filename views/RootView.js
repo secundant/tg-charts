@@ -1,4 +1,4 @@
-import { DataSource, Draggable, ScreenModel, ViewBoxModel } from '../models';
+import { DataSource, Draggable, Renderer, ScreenModel, ViewBoxModel } from '../models';
 import { el } from '../utils/dom/createElement';
 import { createButton, createButtonsGroupElement } from './createButton';
 import { SVGCanvasView } from './SVGCanvasView';
@@ -7,6 +7,7 @@ import style from '../vanilla/style.scss';
 
 export class RootView {
   constructor(dataSource) {
+    this.renderer = new Renderer();
     this.screen = new ScreenModel();
     this.dataSource = new DataSource(dataSource);
     this.draggable = new Draggable();
@@ -26,16 +27,19 @@ export class RootView {
     });
     this.mainCanvasView = new SVGCanvasView({
       viewBox: this.viewBox,
-      dataSource: this.dataSource
+      dataSource: this.dataSource,
+      renderer: this.renderer
     });
     this.previewCanvasView = new SVGCanvasView({
       viewBox: this.previewViewBox,
       dataSource: this.dataSource,
-      strokeWidth: 1
+      strokeWidth: 1,
+      renderer: this.renderer
     });
     this.positionControlView = new PositionControlView({
       draggable: this.draggable,
-      viewBox: this.viewBox
+      viewBox: this.viewBox,
+      renderer: this.renderer
     });
     this.mainChartElement = el('div', {
       class: style.Graph
@@ -47,7 +51,9 @@ export class RootView {
     this.previewCanvasView.renderTo(this.previewChartElement);
     this.positionControlView.renderTo(this.previewChartElement);
     this.buttonsGroupElement = createButtonsGroupElement();
-    this.dataSource.dataSets.forEach(dataSet => this.buttonsGroupElement.appendChild(createButton(dataSet)));
+    this.dataSource.dataSets.forEach(dataSet =>
+      this.buttonsGroupElement.appendChild(createButton(dataSet, this.renderer))
+    );
   }
 
   renderTo(element) {

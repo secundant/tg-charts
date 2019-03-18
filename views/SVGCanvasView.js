@@ -18,17 +18,22 @@ export class SVGCanvasView {
 
     if (width !== this.width) {
       this.width = width;
-      this.svg.setAttributeNS(null, 'width', width);
-      this.svg.setAttributeNS(null, 'viewBox', `0 0 ${width} ${height}`);
+      this.viewBoxValue = `0 0 ${width} ${height}`;
+      this.renderer.set(this._id, this.paint);
     }
+  };
+  paint = () => {
+    this.svg.setAttributeNS(null, 'width', this.width);
+    this.svg.setAttributeNS(null, 'viewBox', this.viewBoxValue);
   };
 
   /**
    * @param {DataSource} dataSource
    * @param {ViewBoxModel} viewBox
    * @param {number} strokeWidth
+   * @param {Renderer} renderer
    */
-  constructor({ dataSource, viewBox, strokeWidth = 2 }) {
+  constructor({ dataSource, viewBox, renderer, strokeWidth = 2 }) {
     this.svg = elNS(['http://www.w3.org/2000/svg', 'svg'], {
       version: '1.1',
       baseProfile: 'full',
@@ -36,9 +41,11 @@ export class SVGCanvasView {
       height: viewBox.height,
       preserveAspectRatio: 'none'
     });
+    this._id = `svg-canvas-view-${performance.now()}-${Math.random()}`;
     this.width = null;
     this.lineViews = new Map();
     this.viewBox = viewBox;
+    this.renderer = renderer;
     this.dataSource = dataSource;
     this.dataSource.dataSets.forEach(dataSet => {
       const line = new LineModel({
@@ -47,7 +54,8 @@ export class SVGCanvasView {
       });
       const lineView = new LineView({
         line,
-        strokeWidth
+        strokeWidth,
+        renderer
       });
 
       if (!dataSet.disabled) {

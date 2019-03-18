@@ -8,7 +8,9 @@ export class Renderer {
       this.actions.forEach(exec);
       this.actions.clear();
       requestAnimationFrame(run);
-    }
+    };
+
+    run();
   }
 
   set(type, fn) {
