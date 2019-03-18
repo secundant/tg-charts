@@ -26,7 +26,8 @@ module.exports = {
   output: {
     name: 'bundle',
     file: 'bundle.js',
-    format: 'iife'
+    format: 'iife',
+    sourcemap: true
   },
   plugins: [
     json(),
