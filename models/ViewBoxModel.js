@@ -1,4 +1,5 @@
 import { Events } from './Events';
+import { createLog } from '../utils/createLog';
 
 export class ViewBoxModel extends Events {
   x = index => Math.round(this.computed.spaceBetween * index - this.computed.offsetWidth);
@@ -28,8 +29,7 @@ export class ViewBoxModel extends Events {
   }
 
   update() {
-    console.group('[ViewBoxModel.update()]');
-    const t = performance.now();
+    const log = createLog('ViewBoxModel');
     const { width, offset, visible } = this.state;
     const scaledWidthRatio = 1 / (visible / 100);
     const scaledWidth = width * scaledWidthRatio;
@@ -50,11 +50,9 @@ export class ViewBoxModel extends Events {
       firstIndex,
       lastIndex
     };
-    const end = performance.now();
 
-    console.debug('Self time:', end - t);
+    log.markSelf();
     this.emit('change', this.computed, this.screen);
-    console.debug('Children time:', performance.now() - t);
-    console.groupEnd();
+    log.end();
   }
 }

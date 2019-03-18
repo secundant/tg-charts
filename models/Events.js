@@ -1,3 +1,5 @@
+import { createLog } from '../utils/createLog';
+
 export class Events {
   constructor() {
     this.listeners = new Map();
@@ -22,6 +24,9 @@ export class Events {
 
   emit(type, ...args) {
     if (!this.listeners.has(type)) return;
+    const log = createLog('Events.emit()');
+
     this.listeners.get(type).forEach(listener => listener(...args));
+    log.end();
   }
 }

@@ -1,4 +1,5 @@
 import { Events } from './Events';
+import { createLog } from '../utils/createLog';
 
 export class LineModel extends Events {
   x = index => Math.round(this.viewBox.computed.spaceBetween * index - this.viewBox.computed.offsetWidth);
@@ -13,14 +14,15 @@ export class LineModel extends Events {
     super();
     this.viewBox = viewBox;
     this.dataSet = dataSet;
-    this.viewBox.on('change', this.update.bind(this));
-    this.dataSet.on('disabledChange', this.update.bind(this));
+    this.update = this.update.bind(this);
+    this.viewBox.on('change', this.update);
+    this.dataSet.on('disabledChange', this.update);
     this.update();
   }
 
   update() {
     if (this.dataSet.disabled) return;
-    const t = performance.now();
+    const log = createLog('LineModel');
     const { firstIndex, lastIndex, initialXPosition } = this.viewBox.computed;
 
     const subset = this.dataSet.subset(firstIndex, lastIndex);
@@ -34,11 +36,9 @@ export class LineModel extends Events {
       this.pathDeclarationsList.push(`L ${this.viewBox.x(index)} ${this.y(index)}`);
     }
     this.pathDeclarationValue = this.pathDeclarationsList.join(' ');
-    const end = performance.now();
 
-    console.debug('Self time:', end - t);
+    log.markSelf();
     this.emit('change');
-    console.debug('Children time:', performance.now() - t);
-    console.groupEnd();
+    log.end();
   }
 }
