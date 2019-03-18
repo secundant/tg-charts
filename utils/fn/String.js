@@ -1,1 +1,1 @@
-export const join = value => list => list.join(value);
+export const join = (separator = '') => (list = []) => list.join(separator);
