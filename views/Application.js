@@ -12,9 +12,11 @@ function read(file) {
   });
 }
 
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-  document.addEventListener(eventName, preventDefaults, false);
-});
+if (IS_CLIENT) {
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    document.addEventListener(eventName, preventDefaults, false);
+  });
+}
 const preventDefaults = e => e.preventDefault();
 
 export class Application {
@@ -37,14 +39,16 @@ export class Application {
       [this.titleElement]
     );
     this.titleElement.textContent = 'Followers';
-    if (!target) {
+    if (!target && IS_CLIENT) {
       target = el('div');
       document.body.appendChild(target);
     }
     this.target = target;
-    document.addEventListener('drop', async ({ dataTransfer: { files: [file] } }) => {
-      this.render(JSON.parse(await read(file)));
-    });
+    if (IS_CLIENT) {
+      document.addEventListener('drop', async ({ dataTransfer: { files: [file] } }) => {
+        this.render(JSON.parse(await read(file)));
+      });
+    }
   }
 
   render(input) {

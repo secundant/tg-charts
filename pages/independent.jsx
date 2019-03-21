@@ -6,7 +6,7 @@ import { Application } from '../views';
 
 function renderChart(target) {
   if (!target) return;
-  new Application(target).render([input[4]]);
+  new Application(target).render([input[2]]);
 }
 
 const IndependentPage = React.memo(() => {

@@ -8,3 +8,7 @@ body {
   overflow-y: auto;
   font-family: get-font-family(Roboto);
 }
+
+body * {
+  box-sizing: border-box;
+}

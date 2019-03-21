@@ -5,6 +5,7 @@ const withSASS = require('@zeit/next-sass');
 const withCSS = require('@zeit/next-css');
 const { resolve } = require('path');
 const { compact } = require('lodash');
+const webpack = require('webpack');
 
 const path = (...prefix) => (...paths) => resolve(...prefix, ...paths);
 const root = path(__dirname);
@@ -37,9 +38,12 @@ module.exports = withPlugins(
   ]),
   {
     target: 'serverless',
-    webpack(config) {
+    webpack(config, { isServer }) {
       config.profile = true;
 
+      config.plugins.push(new webpack.DefinePlugin({
+        IS_CLIENT: `${isServer ? 'false' : 'true'}`
+      }));
       return config
     }
   }
