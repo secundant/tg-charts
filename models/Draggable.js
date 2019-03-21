@@ -78,8 +78,5 @@ const getPageX = event => {
     case 'mousedown':
     case 'mousemove':
       return event.pageX;
-    default:
-      console.error('Wrong event:', event);
-      throw new Error(`Event type "${event.type}" is not supported.`);
   }
 };

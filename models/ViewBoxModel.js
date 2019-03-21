@@ -2,7 +2,7 @@ import { Model } from './Model';
 
 export class ViewBoxModel extends Model {
   x = index => Math.round(this.space * index - this.offsetWidth);
-  y = value => this.padding + Math.round(this.innerHeight - (this.innerHeight * value) / this.max);
+  y = value => this.padding + Math.round(this.innerHeight - (this.innerHeight * (value - this.min)) / (this.max - this.min));
 
   /**
    * @param {ScreenModel} screen
@@ -51,11 +51,14 @@ export class ViewBoxModel extends Model {
     const lastIndex = this.dataSource.indexAt(offset + visible);
     const spaceBetween = scaledWidth / (this.dataSource.length - 1);
     const initialXPosition = Math.round(spaceBetween * firstIndex - offsetWidth);
-    const maxValue = Math.max(
-      ...Array.from(this.dataSource.dataSets.values()).map(dataSet =>
-        dataSet.disabled ? 0 : Math.max(...dataSet.subset(firstIndex, lastIndex + 1))
-      )
+    const datas = Array.from(this.dataSource.dataSets.values()).filter(dataSet => !dataSet.disabled).map(dataSet => {
+        const subset = dataSet.subset(firstIndex, lastIndex + 1);
+
+        return [Math.min(...subset), Math.max(...subset)];
+      }
     );
+    const maxValue = Math.max(...datas.map(v => v[1]));
+    const minValue = Math.min(...datas.map(v => v[0]));
 
     this.offsetWidth = offsetWidth;
     this.firstIndex = firstIndex;
@@ -63,11 +66,18 @@ export class ViewBoxModel extends Model {
     this.initialX = initialXPosition;
     this.space = spaceBetween;
     this.max = this.transition.get(this._id, maxValue);
+    this.min = this.transition.get(this._id + '-min', minValue);
     if (maxValue !== this.prevMax) {
       if (this.prevMax !== null) {
         this.transition.set(this._id, this.max, maxValue);
       }
       this.prevMax = maxValue;
+    }
+    if (minValue !== this.prevMin) {
+      if (this.prevMin !== null) {
+        this.transition.set(this._id + '-min', this.min, minValue);
+      }
+      this.prevMin = minValue;
     }
   }
 }

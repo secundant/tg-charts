@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { Button, ButtonsGroup, Heading, Page, Title } from '~/components';
 import 'sanitize.css';
-import '../style/global.scss';
+import '../views/style/global.scss';
 import style from './index.scss';
 import Head from 'next-server/head';
 import dynamic from 'next-server/dynamic';

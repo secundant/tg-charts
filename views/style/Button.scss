@@ -1,0 +1,128 @@
+@import 'functions';
+@import 'mixins';
+@import 'config';
+
+$button-size: 44px;
+$button-border-width: 1px;
+$button-padding: 9px;
+$button-margin: $offset-regular;
+$button-line-height: $button-size - ($button-padding + $button-border-width) * 2;
+$button-status-check-left: 12px;
+$button-status-check-right: 7px;
+$button-status-check-width: 2px;
+$button-status-check-top: -(
+    (
+        sqrt(
+            pow(($button-status-check-left + $button-status-check-width) / 1px, 2) +
+              pow(($button-status-check-right + $button-status-check-width) / 1px, 2)
+          ) * 1px
+      ) - ($button-status-check-left + $button-status-check-width)
+  ) / 2;
+
+button.Button {
+  @include transition-list($transition-time-regular, border-color background-color color);
+
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  padding: $button-padding;
+  outline: none;
+  border: 1px solid #eee;
+  height: $button-size;
+  line-height: $button-line-height;
+  background-color: transparent;
+  display: inline-flex;
+  border-radius: $button-size / 2;
+  width: auto;
+
+  &:not(:last-child) {
+    margin-right: $button-margin;
+  }
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+
+  @include element-focused {
+    border-color: #ddd;
+  }
+  @include element-active {
+    background-color: #f4f4f8;
+  }
+
+  &.checked {
+    > .Status {
+      > .Check {
+        opacity: 1;
+        transform: scale(1) translateY($button-status-check-top);
+      }
+
+      > .Circle {
+        transform: scale(0);
+      }
+    }
+  }
+
+  &:not(.checked) {
+    > .Status {
+      > .Check {
+        opacity: 0;
+        transform: scale(0) translateY($button-status-check-top);
+      }
+
+      > .Circle {
+        transform: scale(1);
+      }
+    }
+  }
+
+  > .Label {
+    color: #424142;
+    letter-spacing: 0.1px;
+    font-size: 17px;
+  }
+
+  > .Status {
+    $status-border-width: $button-border-width;
+
+    width: $button-line-height;
+    height: $button-line-height;
+    border-radius: $button-line-height / 2;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: $button-padding;
+
+    > .Check,
+    > .Circle {
+      @include transition-list($transition-time-medium, transform opacity);
+    }
+
+    .Check {
+      transform: scale(1) translateY($button-status-check-top);
+      opacity: 1;
+
+      display: inline-block;
+
+      &::after {
+        content: '';
+        display: block;
+        width: $button-status-check-right;
+        height: $button-status-check-left;
+        border: solid #fff;
+        border-width: 0 $button-status-check-width $button-status-check-width 0;
+        transform: rotate(45deg);
+      }
+    }
+
+    .Circle {
+      width: $button-line-height - $status-border-width * 2;
+      height: $button-line-height - $status-border-width * 2;
+      top: $status-border-width;
+      left: $status-border-width;
+      position: absolute;
+      transform: scale(1);
+      background-color: #fff;
+      border-radius: ($button-line-height - $status-border-width * 2) / 2;
+    }
+  }
+}

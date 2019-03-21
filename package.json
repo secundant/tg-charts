@@ -32,11 +32,15 @@
     "prepack": "^0.2.54",
     "prettier": "^1.16.4",
     "rollup": "^1.6.0",
+    "rollup-plugin-analyzer": "^3.0.0",
     "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-graph": "^2.0.0",
     "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^4.0.1",
     "rollup-plugin-postcss": "^2.0.3",
-    "rollup-plugin-terser": "^4.0.4"
+    "rollup-plugin-progress": "^1.1.1",
+    "rollup-plugin-terser": "^4.0.4",
+    "rollup-plugin-visualizer": "^1.1.0"
   },
   "dependencies": {
     "lodash": "^4.17.11",
@@ -53,7 +57,7 @@
     "start": "next",
     "build": "next build",
     "now-build": "next build",
-    "build:rollup": "rollup --config"
+    "build:rollup": "rollup --config rollup/rollup.config.js"
   },
   "husky": {
     "hooks": {

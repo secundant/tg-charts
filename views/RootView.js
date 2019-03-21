@@ -3,15 +3,23 @@ import { el } from '../utils/dom/createElement';
 import { createButton, createButtonsGroupElement } from './createButton';
 import { SVGCanvasView } from './SVGCanvasView';
 import { PositionControlView } from './PositionControlView';
-import style from '../vanilla/style.scss';
+import style from './style.scss';
+import { appendChildren } from '../utils/dom/append';
 
 export class RootView {
-  constructor(dataSource) {
-    this.renderer = new Renderer();
-    this.transition = new Transition();
-    this.screen = new ScreenModel();
+  /**
+   * @param {Object} dataSource
+   * @param {Renderer} renderer
+   * @param {Transition} transition
+   * @param {ScreenModel} screen
+   * @param {Draggable} draggable
+   */
+  constructor({ dataSource, renderer, transition, screen, draggable }) {
     this.dataSource = new DataSource(dataSource);
-    this.draggable = new Draggable();
+    this.transition = transition;
+    this.draggable = draggable;
+    this.renderer = renderer;
+    this.screen = screen;
     this.viewBox = new ViewBoxModel({
       dataSource: this.dataSource,
       screen: this.screen,
@@ -62,9 +70,7 @@ export class RootView {
   renderTo(element) {
     const fragment = document.createDocumentFragment();
 
-    fragment.appendChild(this.mainChartElement);
-    fragment.appendChild(this.previewChartElement);
-    fragment.appendChild(this.buttonsGroupElement);
+    appendChildren(fragment, [this.mainChartElement, this.previewChartElement, this.buttonsGroupElement]);
     element.appendChild(fragment);
     requestAnimationFrame(() => {
       this.screen.update();

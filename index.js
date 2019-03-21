@@ -1,3 +1,11 @@
-import { RootView } from './views';
+import { Application } from './views';
 
-new RootView({}).renderTo(document.getElementById('root'));
+const application = new Application();
+
+document.addEventListener(
+  'DOMContentLoaded',
+  () => {
+    application.render([]);
+  },
+  false
+);

@@ -1,0 +1,90 @@
+@import "style/config";
+@import "style/mixins";
+@import "style/functions";
+@import "style/global";
+@import "style/Button";
+
+$control-color: rgba($color-ui-active, .5);
+
+.Heading {
+  position: relative;
+  margin-bottom: $offset-small;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 0;
+    background-color: #fff;
+    box-shadow: 0 0 8px #fff;
+  }
+
+  > .Title {
+    background-color: #fff;
+    margin: 0;
+    padding: $offset-medium $offset-global-side $offset-regular $offset-global-side;
+    font-size: 22px;
+    font-weight: 500;
+    cursor: text;
+  }
+}
+
+.PositionControl {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  user-select: none;
+
+  > .Backdrop {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: rgba($color-ui-active, .2);
+
+    &.left {
+      left: 0;
+    }
+
+    &.right {
+      right: 0;
+    }
+  }
+
+  > .Group {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    height: 100%;
+    background-color: transparent;
+    border: 1px solid $control-color;
+  }
+
+  .ResizeControl {
+    width: $size-tiny;
+    height: 100%;
+    background-color: $control-color;
+  }
+}
+
+.Graph {
+  height: 280px;
+  margin-bottom: $offset-global-side;
+}
+
+.Preview {
+  height: 60px;
+  margin-bottom: $offset-global-side;
+  position: relative;
+}
+
+.ButtonsGroup {
+  padding: 0 $offset-global-side;
+  margin-bottom: $button-margin;
+}

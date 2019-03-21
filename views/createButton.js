@@ -1,10 +1,9 @@
 import { el } from '../utils/dom/createElement';
-import style from '../components/Button/Button.scss';
-import rootStyle from '../vanilla/style.scss';
+import style from './style.scss';
 
 export function createButtonsGroupElement() {
   return el('div', {
-    class: rootStyle.ButtonsGroup
+    class: style.ButtonsGroup
   });
 }
 

@@ -1,4 +1,4 @@
-import style from '../components/PositionControl/PositionControl.scss';
+import style from './style.scss';
 import { el } from '../utils/dom/createElement';
 
 export class PositionControlView {
@@ -34,7 +34,7 @@ export class PositionControlView {
     this.element = el(
       'div',
       {
-        class: style.Root
+        class: style.PositionControl
       },
       [this.leftBackdropElement, this.controlsGroupElement, this.rightBackdropElement]
     );

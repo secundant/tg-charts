@@ -1,9 +1,13 @@
 const TIME = 125;
 
 export class Transition {
-  constructor() {
+  /**
+   * @param {Renderer} renderer
+   */
+  constructor(renderer) {
     this.items = new Map();
     this.observers = new Map();
+    const register = () => renderer.set('transition', tick);
     const tick = () => {
       this.items.forEach((item, name) => {
         const value = this.calc(name, item);
@@ -12,7 +16,7 @@ export class Transition {
           this.observers.get(name).forEach(observer => observer(value));
         }
       });
-      requestAnimationFrame(tick);
+      Promise.resolve().then(register);
     };
 
     tick();

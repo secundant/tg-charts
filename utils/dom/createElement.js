@@ -1,3 +1,5 @@
+import { appendChildren } from './append';
+
 export const el = (tag = '', attributes = {}, children = []) => {
   const element = document.createElement(tag);
 
@@ -5,12 +7,7 @@ export const el = (tag = '', attributes = {}, children = []) => {
     element.setAttribute(attributeName, attributes[attributeName]);
   }
 
-  if (children) {
-    for (const child of children) {
-      element.appendChild(child);
-    }
-  }
-
+  appendChildren(element, children);
   return element;
 };
 
