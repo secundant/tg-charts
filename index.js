@@ -1,11 +1,4 @@
-import { Application } from './views';
+import { createApplication } from './views';
+import { listen } from './utils/dom';
 
-const application = new Application();
-
-document.addEventListener(
-  'DOMContentLoaded',
-  () => {
-    application.render([]);
-  },
-  false
-);
+listen(document, ['DOMContentLoaded'], () => createApplication(document.body, []));

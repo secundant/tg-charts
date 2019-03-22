@@ -1,0 +1,89 @@
+@import "config";
+@import "mixins";
+@import "functions";
+
+.Application {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #fff;
+  transition: get-transition-list($transition-time-regular, background-color);
+
+  &.DarkTheme {
+    background-color: $color-dark-theme-bg;
+
+    > .Controls {
+      background-color: $color-dark-theme-bg;
+      box-shadow: 0 0 8px $color-dark-theme-bg;
+    }
+
+    .Button {
+      border-color: #465d76;
+
+      @include element-focused {
+        border-color: #304257;
+      }
+      @include element-active {
+        background-color: #465d76;
+      }
+
+      > .Label {
+        color: #f6f6f6;
+      }
+
+      > .Status {
+        > .Circle {
+          background-color: $color-dark-theme-bg;
+        }
+      }
+    }
+
+    .Heading {
+      &::after {
+        background-color: $color-dark-theme-bg;
+        box-shadow: 0 0 8px $color-dark-theme-bg;
+      }
+
+      > .Title {
+        background-color: $color-dark-theme-bg;
+        color: #fff;
+      }
+    }
+  }
+
+  &:not(.DarkTheme) {
+    .Button {
+      @include element-focused {
+        border-color: #ddd;
+      }
+      @include element-active {
+        background-color: #f4f4f8;
+      }
+    }
+  }
+
+  > .Controls {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fff;
+    padding: $offset-small $offset-regular $offset-big;
+    box-shadow: 0 0 8px #fff;
+    transition: get-transition-list($transition-time-regular, background-color box-shadow);
+    color: $color-ui;
+    display: flex;
+    justify-content: space-between;
+
+    > .Prev {
+
+    }
+
+    > .Next {
+
+    }
+
+    > .Switch {
+      font-size: 18px;
+    }
+  }
+}

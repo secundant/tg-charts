@@ -3,8 +3,10 @@
 @import "style/functions";
 @import "style/global";
 @import "style/Button";
+@import "style/Application";
 
 $control-color: rgba(173, 197, 227, 0.5);
+$graph-offset: 10px;
 
 .Heading {
   position: relative;
@@ -17,6 +19,7 @@ $control-color: rgba(173, 197, 227, 0.5);
     height: 0;
     background-color: #fff;
     box-shadow: 0 0 8px #fff;
+    transition: get-transition-list($transition-time-regular, background-color box-shadow);
   }
 
   > .Title {
@@ -26,6 +29,7 @@ $control-color: rgba(173, 197, 227, 0.5);
     font-size: 22px;
     font-weight: 500;
     cursor: text;
+    transition: get-transition-list($transition-time-regular, background-color color);
   }
 }
 
@@ -35,7 +39,7 @@ $control-color: rgba(173, 197, 227, 0.5);
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: 3;
   user-select: none;
 
   > .Backdrop {
@@ -76,17 +80,56 @@ $control-color: rgba(173, 197, 227, 0.5);
 }
 
 .Graph {
+  width: calc(100% - #{$graph-offset});
+  margin-right: $graph-offset;
   height: 280px;
-  margin-bottom: $offset-global-side;
-}
-
-.Preview {
-  height: 60px;
-  margin-bottom: $offset-global-side;
+  margin-bottom: $graph-offset;
+  overflow: hidden;
   position: relative;
 }
 
+.Preview {
+  width: calc(100% - #{$graph-offset * 2});
+  margin: 0 $graph-offset $graph-offset $graph-offset;
+  height: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
 .ButtonsGroup {
-  padding: 0 $offset-global-side;
+  padding: 0 $graph-offset;
   margin-bottom: $button-margin;
+}
+
+.SVG {
+  position: relative;
+  z-index: 2;
+}
+
+.AxisY {
+  width: calc(100% - #{$graph-offset});
+  display: flex;
+  align-items: flex-end;
+  position: absolute;
+  z-index: 1;
+  left: $graph-offset;
+  right: 0;
+  transform: translateY(0);
+  transition: get-transition-list($transition-time-regular, opacity transform);
+  height: calc(100% / 6);
+  padding-bottom: $graph-offset / 2;
+  color: #888;
+  border-bottom: 1px solid #eef1f5;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+
+  &.down {
+    transform: translateY(-100%);
+    opacity: 0.01;
+  }
+
+  &.up {
+    transform: translateY(100%);
+    opacity: 0.01;
+  }
 }

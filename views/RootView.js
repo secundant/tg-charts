@@ -5,6 +5,7 @@ import { SVGCanvasView } from './SVGCanvasView';
 import { PositionControlView } from './PositionControlView';
 import style from './style.scss';
 import { appendChildren } from '../utils/dom/append';
+import { createAxisY } from './AxisYView';
 
 export class RootView {
   /**
@@ -33,7 +34,7 @@ export class RootView {
       height: 60,
       offset: 0,
       visible: 100,
-      padding: 4,
+      padding: 5,
       transition: this.transition
     });
     this.mainCanvasView = new SVGCanvasView({
@@ -65,6 +66,12 @@ export class RootView {
     this.dataSource.dataSets.forEach(dataSet =>
       this.buttonsGroupElement.appendChild(createButton(dataSet, this.renderer))
     );
+    createAxisY({
+      element: this.mainChartElement,
+      renderer: this.renderer,
+      viewBox: this.viewBox,
+      transition: this.transition
+    });
   }
 
   renderTo(element) {
@@ -72,8 +79,5 @@ export class RootView {
 
     appendChildren(fragment, [this.mainChartElement, this.previewChartElement, this.buttonsGroupElement]);
     element.appendChild(fragment);
-    requestAnimationFrame(() => {
-      this.screen.update();
-    });
   }
 }

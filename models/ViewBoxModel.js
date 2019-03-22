@@ -25,6 +25,7 @@ export class ViewBoxModel extends Model {
     this.padding = padding;
     this.innerHeight = height - padding * 2;
     this.prevMax = null;
+    this.prevMin = null;
     this.update();
     transition.subscribe(this._id, value => {
       this.max = value;
@@ -39,6 +40,9 @@ export class ViewBoxModel extends Model {
   }
 
   update() {
+    console.groupEnd();
+    console.group(`ViewBox.update()`);
+    console.time(`ViewBox`);
     const {
       offset,
       visible,
@@ -51,15 +55,18 @@ export class ViewBoxModel extends Model {
     const lastIndex = this.dataSource.indexAt(offset + visible);
     const spaceBetween = scaledWidth / (this.dataSource.length - 1);
     const initialXPosition = Math.round(spaceBetween * firstIndex - offsetWidth);
+    console.time(`Math`);
     const datas = Array.from(this.dataSource.dataSets.values()).filter(dataSet => !dataSet.disabled).map(dataSet => {
         const subset = dataSet.subset(firstIndex, lastIndex + 1);
 
-        return [Math.min(...subset), Math.max(...subset)];
+      return [Math.min.apply(Math, subset), Math.max.apply(Math, subset), subset];
       }
     );
-    const maxValue = Math.max(...datas.map(v => v[1]));
-    const minValue = Math.min(...datas.map(v => v[0]));
+    const maxValue = Math.max.apply(Math, datas.map(v => v[1]));
+    const minValue = Math.min.apply(Math, datas.map(v => v[0]));
 
+    console.timeEnd(`Math`);
+    console.time(`Dynamic`);
     this.offsetWidth = offsetWidth;
     this.firstIndex = firstIndex;
     this.lastIndex = lastIndex;
@@ -79,5 +86,7 @@ export class ViewBoxModel extends Model {
       }
       this.prevMin = minValue;
     }
+    console.timeEnd(`Dynamic`);
+    console.timeEnd(`ViewBox`);
   }
 }

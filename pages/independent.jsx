@@ -2,14 +2,32 @@ import React from 'react';
 import input from '../models/input.json';
 import { Page } from '../components/layout/Page';
 import Head from 'next-server/head';
-import { Application } from '../views';
+import { createApplication } from '../views';
+import { flatten } from 'lodash';
 
-function renderChart(target) {
-  if (!target) return;
-  new Application(target).render([input[2]]);
-}
+const multiplyTarget = Array.from({ length: 25 });
+const multiplyValues = values => multiplyTarget.map(() => values);
+const multiply = ({ columns, ...props }) => ({
+  ...props,
+  columns: columns.map(([name, ...values]) => [
+    name,
+    ...flatten(multiplyValues(values))
+  ])
+});
 
 const IndependentPage = React.memo(() => {
+  let prevChart = React.useRef(null);
+  const renderChart = target => {
+    if (!target) return;
+    if (prevChart && target === prevChart) {
+      prevChart.innerHTML = '';
+    }
+    prevChart = target;
+    const data = [multiply(input[4])];
+
+    createApplication(target, [input[3]]);
+  };
+
   return (
     <Page>
       <Head>

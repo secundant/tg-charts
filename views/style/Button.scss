@@ -41,13 +41,6 @@ button.Button {
     cursor: pointer;
   }
 
-  @include element-focused {
-    border-color: #ddd;
-  }
-  @include element-active {
-    background-color: #f4f4f8;
-  }
-
   &.checked {
     > .Status {
       > .Check {
@@ -78,6 +71,7 @@ button.Button {
     color: #424142;
     letter-spacing: 0.1px;
     font-size: 17px;
+    transition: get-transition-list($transition-time-regular, color);
   }
 
   > .Status {
@@ -123,6 +117,7 @@ button.Button {
       transform: scale(1);
       background-color: #fff;
       border-radius: ($button-line-height - $status-border-width * 2) / 2;
+      @include transition-list($transition-time-regular, background-color);
     }
   }
 }

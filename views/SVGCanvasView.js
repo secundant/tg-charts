@@ -1,6 +1,7 @@
 import { LineModel } from '../models/LineModel';
 import { LineView } from './LineView';
 import { elNS } from '../utils/dom/createElement';
+import styles from './style.scss';
 
 export class SVGCanvasView {
   handleDisabledChange = () => {
@@ -39,7 +40,8 @@ export class SVGCanvasView {
       baseProfile: 'full',
       width: viewBox.screen.width,
       height: viewBox.height,
-      preserveAspectRatio: 'none'
+      preserveAspectRatio: 'none',
+      class: styles.SVG
     });
     this._id = `svg-canvas-view-${performance.now()}-${Math.random()}`;
     this.width = null;

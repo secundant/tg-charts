@@ -1,5 +1,9 @@
 import { appendChildren } from './append';
 
+export const createElementWithClassName = (className, children = [], tag = 'div') => el(tag, {
+  class: className
+}, children);
+
 export const el = (tag = '', attributes = {}, children = []) => {
   const element = document.createElement(tag);
 

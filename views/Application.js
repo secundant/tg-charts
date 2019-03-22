@@ -1,71 +1,41 @@
 import { Draggable, Renderer, ScreenModel, Transition } from '../models';
 import styles from './style.scss';
-import { el } from '../utils/dom/createElement';
+import { createElementWithClassName } from '../utils/dom/createElement';
 import { RootView } from './RootView';
+import { listen } from '../utils/dom';
 
-function read(file) {
-  const reader = new FileReader();
+export const createApplication = (target, input) => {
+  const screen = new ScreenModel();
+  const renderer = new Renderer();
+  const draggable = new Draggable();
+  const transition = new Transition(renderer);
+  const titleElement = createElementWithClassName(styles.Title, [], 'h1');
+  const headerElement = createElementWithClassName(styles.Heading, [titleElement]);
+  const toPrevInputElement = createElementWithClassName(styles.Prev);
+  const toNextInputElement = createElementWithClassName(styles.Next);
+  const switchThemeElement = createElementWithClassName(styles.Switch);
+  const appControlsElement = createElementWithClassName(styles.Controls, [
+    toPrevInputElement,
+    switchThemeElement,
+    toNextInputElement
+  ]);
+  const applicationElement = createElementWithClassName(styles.Application, [headerElement, appControlsElement]);
 
-  return new Promise(resolve => {
-    reader.onload = e => resolve(e.target.result);
-    reader.readAsText(file);
-  });
-}
-
-if (IS_CLIENT) {
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    document.addEventListener(eventName, preventDefaults, false);
-  });
-}
-const preventDefaults = e => e.preventDefault();
-
-export class Application {
-  /**
-   * @param {HTMLElement?} target
-   */
-  constructor({ target } = {}) {
-    this.screen = new ScreenModel();
-    this.renderer = new Renderer();
-    this.draggable = new Draggable();
-    this.transition = new Transition(this.renderer);
-    this.titleElement = el('h1', {
-      class: styles.Title
+  listen(switchThemeElement, ['click'], () => applicationElement.classList.toggle(styles.DarkTheme));
+  titleElement.textContent = 'Followers';
+  switchThemeElement.textContent = 'Switch theme';
+  target.appendChild(applicationElement);
+  input.forEach(dataSource => {
+    const root = new RootView({
+      screen,
+      renderer,
+      draggable,
+      transition,
+      dataSource
     });
-    this.headerElement = el(
-      'div',
-      {
-        class: styles.Heading
-      },
-      [this.titleElement]
-    );
-    this.titleElement.textContent = 'Followers';
-    if (!target && IS_CLIENT) {
-      target = el('div');
-      document.body.appendChild(target);
-    }
-    this.target = target;
-    if (IS_CLIENT) {
-      document.addEventListener('drop', async ({ dataTransfer: { files: [file] } }) => {
-        this.render(JSON.parse(await read(file)));
-      });
-    }
-  }
 
-  render(input) {
-    while (this.target.firstChild) {
-      this.target.removeChild(this.target.firstChild);
-    }
-    this.target.appendChild(this.headerElement);
-    input.forEach(dataSource => {
-      const root = new RootView({
-        dataSource,
-        renderer: this.renderer,
-        transition: this.transition,
-        screen: this.screen,
-        draggable: this.draggable
-      });
+    root.renderTo(applicationElement);
+  });
 
-      root.renderTo(this.target);
-    });
-  }
-}
+  renderer.set('application-init', () => screen.update());
+};
