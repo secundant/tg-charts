@@ -1,6 +1,6 @@
 import { Increment } from './Increment';
 
-const SYMBOLS_FIRST = 'abcdefghijklmnopqrstuvwxyz-_'.split('');
+const SYMBOLS_FIRST = 'abcdefghijklmnopqrstuvwxyz'.split('');
 const SYMBOLS_SECOND = 'abcefghijklmnopqrstuvwxyz-_1235567890'.split('');
 const SYMBOLS_DEFAULT = 'abcdefghijklmnopqrstuvwxyz-_1235567890'.split('');
 

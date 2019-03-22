@@ -1,35 +1,33 @@
-import { nextID } from '../utils';
-import styles from './style.scss';
+import style from './style.scss';
+import { addClassName, nextID, removeClassName } from '../utils';
 import { createElementWithClassName } from '../utils/dom/createElement';
 import { appendChildren } from '../utils/dom/append';
 
+const getDirectionClassName = down => down ? style.down : style.up;
+
 /**
+ * @param {HTMLElement} element
  * @param {Transition} transition
  * @param {Renderer} renderer
  * @param {ViewBoxModel} viewBox
- * @param {HTMLElement} element
  */
-export function createAxisY({ transition, renderer, viewBox, element }) {
+export function withAxisY(element, { transition, renderer, viewBox }) {
   const id = nextID();
   let currentMax = 0;
   let currentMin = 0;
   let prev;
 
   const render = shouldDown => {
-    const className = shouldDown ? styles.down : styles.up;
+    const className = getDirectionClassName(shouldDown);
     const nextElements = createAxisList(currentMax, currentMin, prev ? className : null);
 
-    console.log('RENDER NEXT');
     appendChildren(element, nextElements);
     if (prev) {
-      renderer.set(id, () => {
-        setTimeout(() => {
-          nextElements.forEach(el => el.classList.remove(className))
-        }, 0);
-      });
+      renderer.set(id, () => forEach(nextElements, el => removeClassName(el, className)));
       const prevRef = prev;
+      const classNameToAdd = getDirectionClassName(!shouldDown);
 
-      prev.forEach(el => el.classList.add(shouldDown ? styles.up : styles.down));
+      prev.forEach(el => addClassName(el, classNameToAdd));
       setTimeout(() => {
         prevRef.forEach(el => element.removeChild(el));
       }, 175);
@@ -48,6 +46,7 @@ export function createAxisY({ transition, renderer, viewBox, element }) {
   });
   appendChildren(element, [createAxisElement(0, 0)]);
   render();
+  return element;
 }
 
 const createAxisList = (max, min, className) => {
@@ -61,7 +60,7 @@ const createAxisList = (max, min, className) => {
 };
 const elementsBaseArray = new Array(5).fill(0);
 const createAxisElement = (textContent, top, className) => {
-  const element = createElementWithClassName(`${styles.AxisY}${className ? ' ' + className : ''}`);
+  const element = createElementWithClassName(`${style.AxisY}${className ? ' ' + className : ''}`);
 
   element.style = `bottom:${90 * (top / 5)}%`;
   element.textContent = textContent;

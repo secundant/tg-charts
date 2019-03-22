@@ -1,112 +1,84 @@
 import style from './style.scss';
-import { el } from '../utils/dom/createElement';
+import { createElementWithClassName } from '../utils/dom/createElement';
+import { nextID } from '../utils';
 
-export class PositionControlView {
-  /**
-   * @param {ViewBoxModel} viewBox
-   * @param {Draggable} draggable
-   * @param {Renderer} renderer
-   */
-  constructor({ viewBox, draggable, renderer }) {
-    this._id = `position-control-${performance.now()}-${Math.random()}`;
-    this.viewBox = viewBox;
-    this.renderer = renderer;
-    this.draggable = draggable;
-    this.leftBackdropElement = el('div', {
-      class: style.Backdrop + ' ' + style.left
-    });
-    this.rightBackdropElement = el('div', {
-      class: style.Backdrop + ' ' + style.right
-    });
-    this.leftControlElement = el('div', {
-      class: style.ResizeControl
-    });
-    this.rightControlElement = el('div', {
-      class: style.ResizeControl
-    });
-    this.controlsGroupElement = el(
-      'div',
-      {
-        class: style.Group
-      },
-      [this.leftControlElement, this.rightControlElement]
-    );
-    this.element = el(
-      'div',
-      {
-        class: style.PositionControl
-      },
-      [this.leftBackdropElement, this.controlsGroupElement, this.rightBackdropElement]
-    );
+/**
+ * @param {ViewBoxModel} viewBox
+ * @param {Draggable} draggable
+ * @param {Renderer} renderer
+ */
+export function createPositionControlView(viewBox, draggable, renderer) {
+  let offsetLeft;
+  let offsetRight;
+  let controlWidth;
+  let initial;
 
-    this.paint = this.paint.bind(this);
-    this.viewBox.subscribe(this.update.bind(this));
-    this.draggable.subscribe(this.leftControlElement, this.handleLeft.bind(this));
-    this.draggable.subscribe(this.rightControlElement, this.handleRight.bind(this));
-    this.draggable.subscribe(this.controlsGroupElement, this.handleGroup.bind(this));
-    this.update();
-  }
-
-  handleLeft(type, x) {
+  const id = nextID();
+  const { screen } = viewBox;
+  const backdropLeft = createElementWithClassName(style.Backdrop + ' ' + style.left);
+  const backdropRight = createElementWithClassName(style.Backdrop + ' ' + style.right);
+  const controlLeft = createElementWithClassName(style.ResizeControl);
+  const controlRight = createElementWithClassName(style.ResizeControl);
+  const group = createElementWithClassName(style.Group, [controlLeft, controlRight]);
+  const element = createElementWithClassName(style.PositionControl, [backdropLeft, group, backdropRight]);
+  const paint = () => {
+    backdropLeft.style.width = `${offsetLeft}px`;
+    group.style.width = `${controlWidth}px`;
+    group.style.left = `${offsetLeft}px`;
+    backdropRight.style.width = `${offsetRight}px`;
+    backdropRight.style.left = `${offsetLeft + controlWidth}px`;
+  };
+  const update = () => {
+    controlWidth = (screen.width * viewBox.visible) / 100;
+    offsetLeft = (screen.width * viewBox.offset) / 100;
+    offsetRight = screen.width - (controlWidth + offsetLeft);
+    renderer.set(id, paint);
+  };
+  const createHandler = exec => (type, abs, rel) => {
     if (type === 'end') return;
     if (type === 'start') {
-      this.initialLeft = this.controlWidth;
+      initial = controlWidth;
       return;
     }
-    const { screen: { width }, visible, offset } = this.viewBox;
-    const nextControlWidth = Math.min(Math.max(this.initialLeft - x, 48), (width * (offset + visible)) / 100);
-    const diff = ((nextControlWidth - this.controlWidth) * 100) / width;
+    const [offset, visible] = exec(abs, rel);
 
-    this.viewBox.set({
-      visible: visible + diff,
-      offset: offset - diff
+    viewBox.set({
+      offset,
+      visible
     });
-  }
+  };
 
-  handleRight(type, x) {
-    if (type === 'end') return;
-    if (type === 'start') {
-      this.initialRight = this.controlWidth;
-      return;
-    }
-    const { width } = this.viewBox.screen;
-    const nextWidth = Math.min(Math.max(this.initialRight + x, 48), width - this.offsetLeft);
+  viewBox.subscribe(update);
+  draggable.subscribe(
+    controlLeft,
+    createHandler(x => {
+      const { visible, offset } = viewBox;
+      const { width } = screen;
+      const nextControlWidth = Math.min(Math.max(initial - x, 48), (width * (offset + visible)) / 100);
+      const diff = ((nextControlWidth - controlWidth) * 100) / width;
 
-    this.viewBox.set({
-      visible: (nextWidth * 100) / width
-    });
-  }
+      return [offset - diff, visible + diff];
+    })
+  );
+  draggable.subscribe(
+    controlRight,
+    createHandler(x => {
+      const { width } = screen;
+      const nextWidth = Math.min(Math.max(initial + x, 48), width - offsetLeft);
 
-  handleGroup(type, _, x) {
-    if (type === 'end' || type === 'start') return;
-    const { visible, screen: { width } } = this.viewBox;
-    const nextOffsetLeft = Math.max(Math.min(this.offsetLeft + x, (width * (100 - visible)) / 100), 0);
+      return [void 0, (nextWidth * 100) / width];
+    })
+  );
+  draggable.subscribe(
+    group,
+    createHandler((_, x) => {
+      const { visible } = viewBox;
+      const { width } = screen;
+      const nextOffsetLeft = Math.max(Math.min(offsetLeft + x, (width * (100 - visible)) / 100), 0);
 
-    this.viewBox.set({
-      offset: (nextOffsetLeft * 100) / width
-    });
-  }
-
-  update() {
-    const { screen: { width }, visible, offset } = this.viewBox;
-
-    this.controlWidth = (width * visible) / 100;
-    this.offsetLeft = (width * offset) / 100;
-    this.offsetRight = width - (this.controlWidth + this.offsetLeft);
-    this.renderer.set(this._id, this.paint);
-  }
-
-  paint() {
-    this.leftBackdropElement.style.width = `${this.offsetLeft}px`;
-
-    this.rightBackdropElement.style.width = `${this.offsetRight}px`;
-    this.rightBackdropElement.style.left = `${this.offsetLeft + this.controlWidth}px`;
-
-    this.controlsGroupElement.style.width = `${this.controlWidth}px`;
-    this.controlsGroupElement.style.left = `${this.offsetLeft}px`;
-  }
-
-  renderTo(element) {
-    element.appendChild(this.element);
-  }
+      return [(nextOffsetLeft * 100) / width];
+    })
+  );
+  update();
+  return element;
 }

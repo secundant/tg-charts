@@ -1,10 +1,9 @@
-import { el } from '../utils/dom/createElement';
 import style from './style.scss';
+import { createElementWithClassName, el } from '../utils/dom/createElement';
+import { listen, nextID, setClassName } from '../utils';
 
 export function createButtonsGroupElement() {
-  return el('div', {
-    class: style.ButtonsGroup
-  });
+  return createElementWithClassName(style.ButtonsGroup);
 }
 
 /**
@@ -13,16 +12,11 @@ export function createButtonsGroupElement() {
  */
 export function createButton(dataSet, renderer) {
   const { color, title } = dataSet;
-  const _id = `button-${dataSet.name}-${Math.random()}`;
+  const id = nextID();
 
-  const label = el('div', {
-    class: style.Label
-  });
-  const element = el(
-    'button',
-    {
-      class: `${style.Button} ${style.checked}`
-    },
+  const label = createElementWithClassName(style.Label);
+  const element = createElementWithClassName(
+    style.Button + ' ' + style.checked,
     [
       el(
         'div',
@@ -30,23 +24,17 @@ export function createButton(dataSet, renderer) {
           class: style.Status,
           style: `background-color: ${color}`
         },
-        [
-          el('div', {
-            class: style.Circle
-          }),
-          el('div', {
-            class: style.Check
-          })
-        ]
+        [createElementWithClassName(style.Circle), createElementWithClassName(style.Check)]
       ),
       label
-    ]
+    ],
+    'button'
   );
-  const paint = () => element.classList[!dataSet.disabled ? 'add' : 'remove'](style.checked);
-  const update = () => renderer.set(_id, paint);
+  const paint = () => setClassName(element, style.checked, !dataSet.disabled);
+  const update = () => renderer.set(id, paint);
 
   label.textContent = title;
   dataSet.subscribe(update);
-  element.addEventListener('click', () => dataSet.set(!dataSet.disabled), false);
+  listen(element, ['click'], () => dataSet.set(!dataSet.disabled));
   return element;
 }
