@@ -1,76 +1,61 @@
+import style from './style.scss';
 import { LineModel } from '../models/LineModel';
-import { LineView } from './LineView';
-import { elNS } from '../utils/dom/createElement';
-import styles from './style.scss';
+import { createLineView } from './LineView';
+import { attributesNS, elNS } from '../utils/dom/createElement';
+import { appendChild, nextID, setClassName } from '../utils';
 
-export class SVGCanvasView {
-  handleDisabledChange = () => {
-    const dataSet = this.dataSource.last;
-    const lineView = this.lineViews.get(dataSet.name);
+/**
+ * @param {DataSource} dataSource
+ * @param {ViewBoxModel} viewBoxModel
+ * @param {Renderer} renderer
+ * @param {number} [strokeWidth=2]
+ */
+export function createSVGCanvasView(dataSource, viewBoxModel, renderer, strokeWidth = 2) {
+  let width = null;
+  let viewBox = null;
 
-    if (dataSet.disabled) {
-      this.svg.removeChild(lineView.element);
-    } else {
-      lineView.renderTo(this.svg);
-    }
-  };
-  update = () => {
-    const { screen: { width }, height } = this.viewBox;
-
-    if (width !== this.width) {
-      this.width = width;
-      this.viewBoxValue = `0 0 ${width} ${height}`;
-      this.renderer.set(this._id, this.paint);
-    }
-  };
-  paint = () => {
-    this.svg.setAttributeNS(null, 'width', this.width);
-    this.svg.setAttributeNS(null, 'viewBox', this.viewBoxValue);
-  };
-
-  /**
-   * @param {DataSource} dataSource
-   * @param {ViewBoxModel} viewBox
-   * @param {number} strokeWidth
-   * @param {Renderer} renderer
-   */
-  constructor({ dataSource, viewBox, renderer, strokeWidth = 2 }) {
-    this.svg = elNS(['http://www.w3.org/2000/svg', 'svg'], {
-      version: '1.1',
-      baseProfile: 'full',
-      width: viewBox.screen.width,
-      height: viewBox.height,
-      preserveAspectRatio: 'none',
-      class: styles.SVG
+  const id = nextID();
+  const svg = elNS(['http://www.w3.org/2000/svg', 'svg'], {
+    version: '1.1',
+    baseProfile: 'full',
+    width: viewBoxModel.screen.width,
+    height: viewBoxModel.height,
+    preserveAspectRatio: 'none',
+    class: style.SVG
+  });
+  const lineViews = new Map();
+  const paint = () => {
+    attributesNS(svg, {
+      width,
+      viewBox
     });
-    this._id = `svg-canvas-view-${performance.now()}-${Math.random()}`;
-    this.width = null;
-    this.lineViews = new Map();
-    this.viewBox = viewBox;
-    this.renderer = renderer;
-    this.dataSource = dataSource;
-    this.dataSource.dataSets.forEach(dataSet => {
-      const line = new LineModel({
-        viewBox,
-        dataSet
-      });
-      const lineView = new LineView({
-        line,
-        strokeWidth,
-        renderer
-      });
+  };
+  const update = () => {
+    if (viewBoxModel.screen.width === width) return;
+    width = viewBoxModel.screen.width;
+    viewBox = `0 0 ${width} ${height}`;
+    renderer.set(id, paint);
+  };
+  const handleDisabledChange = () => {
+    const dataSet = dataSource.last;
+    const lineView = lineViews.get(dataSet.name);
 
-      if (!dataSet.disabled) {
-        lineView.renderTo(this.svg);
-      }
-      this.lineViews.set(dataSet.name, lineView);
+    setClassName(lineView, style.hidden, dataSet.disabled);
+  };
+
+  dataSource.dataSets.forEach(dataSet => {
+    const line = new LineModel({
+      viewBox: viewBoxModel,
+      dataSet
     });
-    this.dataSource.subscribe(this.handleDisabledChange);
-    this.viewBox.subscribe(this.update);
-    this.update();
-  }
+    const lineView = createLineView(line, renderer, strokeWidth);
 
-  renderTo(element) {
-    element.appendChild(this.svg);
-  }
+    appendChild(svg, lineView);
+    lineViews.set(dataSet.name, lineView);
+  });
+  dataSource.subscribe(handleDisabledChange);
+  viewBoxModel.subscribe(update);
+  update();
+
+  return svg;
 }

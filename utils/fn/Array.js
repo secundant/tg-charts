@@ -8,3 +8,5 @@ export const compact = (arr = []) => arr.filter(isTruthy);
 
 export const flatten = (list = []) =>
   list.reduce((acc, item) => acc.concat(Array.isArray(item) ? flatten(item) : item), []);
+
+export const forEach = (list, fn) => list.forEach(fn);

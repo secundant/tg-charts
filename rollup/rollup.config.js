@@ -7,19 +7,23 @@ import babel from 'rollup-plugin-babel';
 import json from 'rollup-plugin-json';
 import { terser } from 'rollup-plugin-terser';
 import { createIdentNameGetter } from './IdentName';
+import compact from 'lodash/compact';
 
 const createTerser = () => terser({
   toplevel: true,
   mangle: {
     toplevel: true,
-    eval: true
+    eval: true,
+    properties: {}
   },
   compress: {
-    passes: 2,
+    toplevel: true,
+    hoist_vars: true,
+    hoist_props: true,
+    passes: 1,
     arguments: true,
     booleans_as_integers: true,
-    ecma: 6,
-    unsafe: true
+    ecma: 6
   },
   ecma: 7,
   keep_classnames: false,
@@ -31,14 +35,14 @@ const createTerser = () => terser({
 });
 
 module.exports = {
-  input: 'index.js',
+  input: 'test-css-modules.js',
   output: {
     name: 'bundle',
     file: 'dist/bundle.js',
     format: 'iife',
     sourcemap: true
   },
-  plugins: [
+  plugins: compact([
     json(),
     resolve({ extensions: ['.js'] }),
     postcss({
@@ -57,11 +61,11 @@ module.exports = {
       plugins: ['@babel/plugin-proposal-class-properties']
     }),
     progress(),
-    visualizer({
+    process.env.ANALYZE && visualizer({
       filename: './dist/build.info.html',
       sourcemap: true,
-      open: true
+      open: process.env.ANALYZE === 'open'
     }),
-    createTerser()
-  ]
+    process.env.MINIFY && createTerser()
+  ])
 };

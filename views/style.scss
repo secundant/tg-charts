@@ -79,6 +79,11 @@ $graph-offset: 10px;
   }
 }
 
+.Root {
+  width: 100%;
+  height: auto;
+}
+
 .Graph {
   width: calc(100% - #{$graph-offset});
   margin-right: $graph-offset;
@@ -131,5 +136,14 @@ $graph-offset: 10px;
   &.up {
     transform: translateY(100%);
     opacity: 0.01;
+  }
+}
+
+.Line {
+  opacity: 1;
+  transition: $transition-time-regular opacity;
+
+  &.hidden {
+    opacity: 0;
   }
 }

@@ -1,83 +1,52 @@
-import { DataSource, Draggable, Renderer, ScreenModel, Transition, ViewBoxModel } from '../models';
-import { el } from '../utils/dom/createElement';
-import { createButton, createButtonsGroupElement } from './createButton';
-import { SVGCanvasView } from './SVGCanvasView';
-import { PositionControlView } from './PositionControlView';
 import style from './style.scss';
-import { appendChildren } from '../utils/dom/append';
-import { createAxisY } from './AxisYView';
+import { DataSource, Draggable, Renderer, ScreenModel, Transition, ViewBoxModel } from '../models';
+import { createElementWithClassName } from '../utils/dom/createElement';
+import { createButton } from './createButton';
+import { createSVGCanvasView } from './SVGCanvasView';
+import { createPositionControlView } from './PositionControlView';
+import { withAxisY } from './AxisYView';
 
-export class RootView {
-  /**
-   * @param {Object} dataSource
-   * @param {Renderer} renderer
-   * @param {Transition} transition
-   * @param {ScreenModel} screen
-   * @param {Draggable} draggable
-   */
-  constructor({ dataSource, renderer, transition, screen, draggable }) {
-    this.dataSource = new DataSource(dataSource);
-    this.transition = transition;
-    this.draggable = draggable;
-    this.renderer = renderer;
-    this.screen = screen;
-    this.viewBox = new ViewBoxModel({
-      dataSource: this.dataSource,
-      screen: this.screen,
-      height: 280,
-      padding: 10,
-      transition: this.transition
-    });
-    this.previewViewBox = new ViewBoxModel({
-      dataSource: this.dataSource,
-      screen: this.screen,
-      height: 60,
-      offset: 0,
-      visible: 100,
-      padding: 5,
-      transition: this.transition
-    });
-    this.mainCanvasView = new SVGCanvasView({
-      viewBox: this.viewBox,
-      dataSource: this.dataSource,
-      renderer: this.renderer
-    });
-    this.previewCanvasView = new SVGCanvasView({
-      viewBox: this.previewViewBox,
-      dataSource: this.dataSource,
-      strokeWidth: 1,
-      renderer: this.renderer
-    });
-    this.positionControlView = new PositionControlView({
-      draggable: this.draggable,
-      viewBox: this.viewBox,
-      renderer: this.renderer
-    });
-    this.mainChartElement = el('div', {
-      class: style.Graph
-    });
-    this.previewChartElement = el('div', {
-      class: style.Preview
-    });
-    this.mainCanvasView.renderTo(this.mainChartElement);
-    this.previewCanvasView.renderTo(this.previewChartElement);
-    this.positionControlView.renderTo(this.previewChartElement);
-    this.buttonsGroupElement = createButtonsGroupElement();
-    this.dataSource.dataSets.forEach(dataSet =>
-      this.buttonsGroupElement.appendChild(createButton(dataSet, this.renderer))
-    );
-    createAxisY({
-      element: this.mainChartElement,
-      renderer: this.renderer,
-      viewBox: this.viewBox,
-      transition: this.transition
-    });
-  }
+/**
+ * @param {Object} input
+ * @param {Renderer} renderer
+ * @param {Transition} transition
+ * @param {ScreenModel} screen
+ * @param {Draggable} draggable
+ */
+export function createRootView(input, renderer, transition, screen, draggable) {
+  const dataSource = new DataSource(input);
+  const viewBox = new ViewBoxModel({
+    dataSource,
+    screen,
+    height: 280,
+    padding: 10,
+    transition
+  });
+  const previewViewBox = new ViewBoxModel({
+    dataSource,
+    screen,
+    height: 60,
+    offset: 0,
+    visible: 100,
+    padding: 5,
+    transition
+  });
 
-  renderTo(element) {
-    const fragment = document.createDocumentFragment();
-
-    appendChildren(fragment, [this.mainChartElement, this.previewChartElement, this.buttonsGroupElement]);
-    element.appendChild(fragment);
-  }
+  return createElementWithClassName(style.Root, [
+    createElementWithClassName(style.Graph, [
+      withAxisY(createSVGCanvasView(dataSource, viewBox, renderer), {
+        viewBox,
+        renderer,
+        transition
+      })
+    ]),
+    createElementWithClassName(style.Preview, [
+      createSVGCanvasView(dataSource, previewViewBox, renderer),
+      createPositionControlView(viewBox, draggable, renderer)
+    ]),
+    createElementWithClassName(
+      style.ButtonsGroup,
+      Array.from(dataSource.dataSets.values()).map(dataSet => createButton(dataSet, renderer))
+    )
+  ]);
 }
