@@ -1,18 +1,11 @@
 import style from './style.scss';
-import { DataSource, Draggable, Renderer, ScreenModel, Transition, ViewBoxModel } from '../models';
+import { DataSource, ViewBoxModel } from '../models';
 import { createElementWithClassName } from '../utils/dom/createElement';
 import { createButton } from './createButton';
 import { createSVGCanvasView } from './SVGCanvasView';
 import { createPositionControlView } from './PositionControlView';
-import { withAxisY } from './AxisYView';
+import { withAxisY } from './withAxisY';
 
-/**
- * @param {Object} input
- * @param {Renderer} renderer
- * @param {Transition} transition
- * @param {ScreenModel} screen
- * @param {Draggable} draggable
- */
 export function createRootView(input, renderer, transition, screen, draggable) {
   const dataSource = new DataSource(input);
   const viewBox = new ViewBoxModel({
@@ -33,13 +26,11 @@ export function createRootView(input, renderer, transition, screen, draggable) {
   });
 
   return createElementWithClassName(style.Root, [
-    createElementWithClassName(style.Graph, [
-      withAxisY(createSVGCanvasView(dataSource, viewBox, renderer), {
-        viewBox,
-        renderer,
-        transition
-      })
-    ]),
+    withAxisY(createElementWithClassName(style.Graph, [createSVGCanvasView(dataSource, viewBox, renderer)]), {
+      viewBox,
+      renderer,
+      transition
+    }),
     createElementWithClassName(style.Preview, [
       createSVGCanvasView(dataSource, previewViewBox, renderer),
       createPositionControlView(viewBox, draggable, renderer)

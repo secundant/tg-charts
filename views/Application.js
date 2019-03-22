@@ -1,4 +1,4 @@
-import { Draggable, Renderer, ScreenModel, Transition } from '../models';
+import { createDraggable, createRenderer, createTransition, ScreenModel } from '../models';
 import style from './style.scss';
 import { createElementWithClassName } from '../utils/dom/createElement';
 import { createRootView } from './RootView';
@@ -7,9 +7,9 @@ import { forEach } from '../utils/fn';
 
 export const createApplication = (target, input) => {
   const screen = new ScreenModel();
-  const renderer = new Renderer();
-  const draggable = new Draggable();
-  const transition = new Transition(renderer);
+  const renderer = createRenderer();
+  const draggable = createDraggable();
+  const transition = createTransition(renderer);
   const titleElement = createElementWithClassName(style.Title, [], 'h1');
   const headerElement = createElementWithClassName(style.Heading, [titleElement]);
   const toPrevInputElement = createElementWithClassName(style.Prev);
@@ -28,9 +28,9 @@ export const createApplication = (target, input) => {
   titleElement.textContent = 'Followers';
   switchThemeElement.textContent = 'Switch theme';
   appendChild(target, applicationElement);
-  forEach(input, dataSource => appendChild(applicationElement, createRootView(
-    dataSource, renderer, transition, screen, draggable
-  )));
+  forEach(input, dataSource =>
+    appendChild(applicationElement, createRootView(dataSource, renderer, transition, screen, draggable))
+  );
 
-  renderer.set('application-init', () => screen.update());
+  renderer('application-init', () => screen.update());
 };

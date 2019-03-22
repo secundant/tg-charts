@@ -2,11 +2,6 @@ import style from './style.scss';
 import { createElementWithClassName } from '../utils/dom/createElement';
 import { nextID } from '../utils';
 
-/**
- * @param {ViewBoxModel} viewBox
- * @param {Draggable} draggable
- * @param {Renderer} renderer
- */
 export function createPositionControlView(viewBox, draggable, renderer) {
   let offsetLeft;
   let offsetRight;
@@ -32,7 +27,7 @@ export function createPositionControlView(viewBox, draggable, renderer) {
     controlWidth = (screen.width * viewBox.visible) / 100;
     offsetLeft = (screen.width * viewBox.offset) / 100;
     offsetRight = screen.width - (controlWidth + offsetLeft);
-    renderer.set(id, paint);
+    renderer(id, paint);
   };
   const createHandler = exec => (type, abs, rel) => {
     if (type === 'end') return;
@@ -49,7 +44,7 @@ export function createPositionControlView(viewBox, draggable, renderer) {
   };
 
   viewBox.subscribe(update);
-  draggable.subscribe(
+  draggable(
     controlLeft,
     createHandler(x => {
       const { visible, offset } = viewBox;
@@ -60,7 +55,7 @@ export function createPositionControlView(viewBox, draggable, renderer) {
       return [offset - diff, visible + diff];
     })
   );
-  draggable.subscribe(
+  draggable(
     controlRight,
     createHandler(x => {
       const { width } = screen;
@@ -69,7 +64,7 @@ export function createPositionControlView(viewBox, draggable, renderer) {
       return [void 0, (nextWidth * 100) / width];
     })
   );
-  draggable.subscribe(
+  draggable(
     group,
     createHandler((_, x) => {
       const { visible } = viewBox;

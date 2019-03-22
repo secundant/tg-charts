@@ -48,6 +48,7 @@ $graph-offset: 10px;
     bottom: 0;
     background-color: rgba(244, 250, 253, 0.8);
     z-index: 1;
+    transition: $transition-time-regular background-color;
 
     &.left {
       left: 0;
@@ -70,12 +71,14 @@ $graph-offset: 10px;
     height: 100%;
     background-color: transparent;
     border: 1px solid $control-color;
+    transition: get-transition-list($transition-time-regular, border-color);
   }
 
   .ResizeControl {
     width: 8px;
     height: 100%;
     background-color: $control-color;
+    transition: get-transition-list($transition-time-regular, background-color);
   }
 }
 
@@ -111,22 +114,26 @@ $graph-offset: 10px;
   z-index: 2;
 }
 
+.AxisX,
+.AxisY {
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  color: #888;
+  position: absolute;
+  z-index: 1;
+}
+
 .AxisY {
   width: calc(100% - #{$graph-offset});
   display: flex;
   align-items: flex-end;
-  position: absolute;
-  z-index: 1;
   left: $graph-offset;
   right: 0;
   transform: translateY(0);
-  transition: get-transition-list($transition-time-regular, opacity transform);
+  transition: get-transition-list($transition-time-regular, opacity transform border-bottom-color);
   height: calc(100% / 6);
   padding-bottom: $graph-offset / 2;
-  color: #888;
   border-bottom: 1px solid #eef1f5;
-  font-size: 14px;
-  letter-spacing: 0.5px;
 
   &.down {
     transform: translateY(-100%);
@@ -135,6 +142,29 @@ $graph-offset: 10px;
 
   &.up {
     transform: translateY(100%);
+    opacity: 0.01;
+  }
+}
+
+.AxisXContainer {
+  height: 40px;
+  line-height: 40px;
+  margin-bottom: $offset-regular;
+}
+
+.AxisX {
+  transform: translateX(0);
+  transition: get-transition-list($transition-time-regular, opacity transform);
+  height: 40px;
+  line-height: 40px;
+
+  &.left {
+    transform: translateX(-100%);
+    opacity: 0.01;
+  }
+
+  &.right {
+    transform: translateX(100%);
     opacity: 0.01;
   }
 }

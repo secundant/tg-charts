@@ -4,12 +4,6 @@ import { createLineView } from './LineView';
 import { attributesNS, elNS } from '../utils/dom/createElement';
 import { appendChild, nextID, setClassName } from '../utils';
 
-/**
- * @param {DataSource} dataSource
- * @param {ViewBoxModel} viewBoxModel
- * @param {Renderer} renderer
- * @param {number} [strokeWidth=2]
- */
 export function createSVGCanvasView(dataSource, viewBoxModel, renderer, strokeWidth = 2) {
   let width = null;
   let viewBox = null;
@@ -33,8 +27,8 @@ export function createSVGCanvasView(dataSource, viewBoxModel, renderer, strokeWi
   const update = () => {
     if (viewBoxModel.screen.width === width) return;
     width = viewBoxModel.screen.width;
-    viewBox = `0 0 ${width} ${height}`;
-    renderer.set(id, paint);
+    viewBox = `0 0 ${width} ${viewBoxModel.height}`;
+    renderer(id, paint);
   };
   const handleDisabledChange = () => {
     const dataSet = dataSource.last;

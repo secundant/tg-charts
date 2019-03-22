@@ -1,18 +1,15 @@
-export class Renderer {
-  constructor() {
-    this.actions = new Map();
-    const run = () => {
-      this.actions.forEach(exec);
-      this.actions.clear();
-      requestAnimationFrame(run);
-    };
+import { forEach } from '../../utils/fn';
 
-    run();
-  }
+export function createRenderer() {
+  const actions = new Map();
+  const run = () => {
+    forEach(actions, exec);
+    actions.clear();
+    requestAnimationFrame(run);
+  };
 
-  set(type, fn) {
-    this.actions.set(type, fn);
-  }
+  run();
+  return (type, fn) => actions.set(type, fn);
 }
 
 const exec = fn => fn();

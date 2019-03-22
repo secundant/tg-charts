@@ -14,15 +14,18 @@ const createTerser = () => terser({
   mangle: {
     toplevel: true,
     eval: true,
-    properties: {}
+    properties: {
+      reserved: ['class', 'renderer']
+    }
   },
   compress: {
     toplevel: true,
     hoist_vars: true,
     hoist_props: true,
-    passes: 1,
+    passes: 5,
     arguments: true,
     booleans_as_integers: true,
+    drop_console: false,
     ecma: 6
   },
   ecma: 7,
@@ -35,7 +38,7 @@ const createTerser = () => terser({
 });
 
 module.exports = {
-  input: 'test-css-modules.js',
+  input: 'index.js',
   output: {
     name: 'bundle',
     file: 'dist/bundle.js',

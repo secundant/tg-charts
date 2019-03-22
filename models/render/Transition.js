@@ -1,55 +1,46 @@
-const TIME = 125;
+import { forEach } from '../../utils/fn';
 
-export class Transition {
-  /**
-   * @param {Renderer} renderer
-   */
-  constructor(renderer) {
-    this.items = new Map();
-    this.observers = new Map();
-    const register = () => renderer.set('transition', tick);
-    const tick = () => {
-      this.items.forEach((item, name) => {
-        const value = this.calc(name, item);
+const TIME = 175;
 
-        if (this.observers.has(name)) {
-          this.observers.get(name).forEach(observer => observer(value));
-        }
-      });
-      Promise.resolve().then(register);
-    };
+export function createTransition(renderer) {
+  const items = new Map();
+  const observers = new Map();
+  const register = () => renderer('transition', tick);
+  const tick = () => {
+    forEach(items, (item, name) => {
+      const value = calc(name, item);
 
-    tick();
-  }
-
-  subscribe(name, observer) {
-    if (!this.observers.has(name)) {
-      this.observers.set(name, new Set([observer]));
-    } else {
-      this.observers.get(name).add(observer);
-    }
-  }
-
-  calc(name, item = this.items.get(name)) {
+      if (observers.has(name)) {
+        forEach(observers.get(name), observer => observer(value));
+      }
+    });
+    Promise.resolve().then(register);
+  };
+  const calc = (name, item = items.get(name)) => {
     const value = getCurrentValue(item);
 
-    if (item[1] === value) this.items.delete(name);
+    if (item[1] === value) items.delete(name);
     return value;
-  }
+  };
 
-  get(name, fallback) {
-    if (!this.items.has(name)) return fallback;
-    return this.calc(name);
-  }
-
-  /**
-   * @param {string} name
-   * @param {number} from
-   * @param {number} to
-   */
-  set(name, from, to) {
-    this.items.set(name, [from, to - from, Date.now()]);
-  }
+  tick();
+  return {
+    calc,
+    get(name, fallback) {
+      if (!items.has(name)) return fallback;
+      return calc(name);
+    },
+    set(name, from, to) {
+      items.set(name, [from, to - from, Date.now()]);
+    },
+    subscribe(name, observer) {
+      if (!observers.has(name)) {
+        observers.set(name, new Set([observer]));
+      } else {
+        observers.get(name).add(observer);
+      }
+    }
+  };
 }
 
 const getCurrentValue = ([from, diff, startedAt]) => from + (diff * Math.min(TIME, Date.now() - startedAt)) / TIME;
