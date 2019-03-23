@@ -219,10 +219,10 @@
   resolved "https://registry.yarnpkg.com/@now/node-bridge/-/node-bridge-1.0.0.tgz#3e7c1cd5760dc681febb4689201bbea6fdd35230"
   integrity sha512-tHcr0GlgNlE8ucjuw4w7mseJ68R4VkxuHbFQpSUJ5cZqTJbKggtsdv9UL3u5uBJBXgqDmidlEepF3wOm7A99IQ==
 
-"@now/node@^0.5.1":
+"@now/node-server@^0.5.1":
   version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@now/node/-/node-0.5.1.tgz#4dc0db8c2fb89f2bebfa6798b29b8361c664ab3a"
-  integrity sha512-12Ik27ZTUxZUay9jvmiMC8/WGCUFrfwqBcTv6jVB7MvBelU5bTqqaFGmYK8Glt64oW1+UWQfCHbViiQKonUI9A==
+  resolved "https://registry.yarnpkg.com/@now/node-server/-/node-server-0.5.1.tgz#a32a58be04179d5dbf7acfdb3e9067b50d7232cf"
+  integrity sha512-FSKn9nb/TNsRi1Sku1dejjNJgmxIV1dPaSje5bgALopNHZ3pdexb6xj6fN3b/e4ZFLYh7NaQObmFfK+mWpt9WQ==
   dependencies:
     "@now/node-bridge" "1.0.0"
     fs-extra "7.0.1"
