@@ -1,62 +1,114 @@
 import style from './style.scss';
-import { addClassName, forEach, nextID, removeClassName } from '../utils';
-import { createElementWithClassName } from '../utils/dom/createElement';
-import { appendChildren } from '../utils/dom/append';
+import { flatten, forEach } from '../utils/fn';
+import { nextID, prepend, removeChildren } from '../utils';
+import { attributesNS, elNS } from '../utils/dom/createElement';
 
-const getDirectionClassName = down => down ? style.down : style.up;
+export function withAxisY(svg, renderer, transition, viewBox) {
+  let currentMax = viewBox.prevMax;
+  let currentMin = viewBox.prevMin;
+  let currentList;
+  let currentFactor = 0;
+  let prevWidth = viewBox.screen.width;
+  let currentID;
+  const axisID = nextID('withAxisY');
+  const itemHeight = (viewBox.height - 0) / (FREE_LINES_COUNT + 1);
+  const animation = new Set();
+  const y = (index, value) => {
+    const selfOffset = (1 + FREE_LINES_COUNT - index) * itemHeight;
 
-export function withAxisY(element, { transition, renderer, viewBox }) {
-  const id = nextID();
-  let currentMax = 0;
-  let currentMin = 0;
-  let prev;
-
-  const render = shouldDown => {
-    const className = getDirectionClassName(shouldDown);
-    const nextElements = createAxisList(currentMax, currentMin, prev ? className : null);
-
-    appendChildren(element, nextElements);
-    if (prev) {
-      renderer(id, () => setTimeout(() => {
-        forEach(nextElements, el => removeClassName(el, className))
-      }, 0));
-      const prevRef = prev;
-      const classNameToAdd = getDirectionClassName(!shouldDown);
-
-      forEach(prev, el => addClassName(el, classNameToAdd));
-      setTimeout(() => {
-        forEach(prevRef, el => element.removeChild(el));
-      }, 175);
-    }
-    prev = nextElements;
+    return selfOffset + value * itemHeight;
   };
-  viewBox.subscribe(() => {
-    const { prevMax, prevMin } = viewBox;
+  const repaint = () => {
+    if (!animation.size) return;
+    const value = transition.get(axisID + 'repaint', null);
+
+    forEach(animation, item => {
+      const { list, factor, hasInit, isCurrent } = item;
+
+      if (value === null || ((value === 1 || value === 0) && hasInit)) {
+        animation.delete(item);
+        if (!isCurrent) {
+          return removeChildren(svg, flatten(list));
+        }
+      }
+      item.hasInit = true;
+      forEach(list, ([text, line], index) => {
+        const realValue = value === null ? 0 : value;
+        const size = y(index + 1, realValue * factor);
+        const style = `opacity:${realValue < 0 ? 1 + realValue : 1 - realValue}`;
+
+        attributesNS(text, {
+          y: size - TEXT_OFFSET,
+          style
+        });
+        attributesNS(line, {
+          y1: size,
+          y2: size,
+          style
+        });
+      });
+    });
+  };
+  const paint = () => {
+    if (currentList) {
+      animation.add({
+        list: currentList,
+        factor: currentFactor
+      });
+    }
+    currentID = nextID('axis-x');
+    currentList = Array.from({ length: FREE_LINES_COUNT }).map((_, index) => {
+      const cleanMax = currentMax - currentMin - (currentMax % 10);
+      const item = createLine(
+        prevWidth,
+        y(index, currentFactor),
+        Math.round(cleanMax / ((FREE_LINES_COUNT - index) / FREE_LINES_COUNT))
+      );
+
+      prepend(svg, ...item);
+      return item;
+    });
+    animation.add({
+      list: currentList,
+      factor: currentFactor,
+      isCurrent: true
+    });
+    transition.set(axisID + 'repaint', 0, 1);
+  };
+  const update = () => {
+    const { prevMin, prevMax } = viewBox;
 
     if (prevMax === currentMax) return;
-    const shouldDown = prevMax > currentMax;
-
-    currentMin = prevMin;
+    currentFactor = prevMax > currentMax ? -1 : 1;
     currentMax = prevMax;
-    render(shouldDown);
-  });
-  appendChildren(element, [createAxisElement(0, 0)]);
-  render();
-  return element;
+    currentMin = prevMin;
+    renderer(axisID, paint);
+  };
+
+  transition.subscribe(axisID + 'repaint', repaint);
+  viewBox.subscribe(update);
+  prepend(svg, ...createLine(prevWidth, y(0, 0), 0));
+  paint();
 }
 
-const createAxisList = (max, min, className) => {
-  const cleanMax = max - min - (max % 10);
+const createLine = (x, y, text) => {
+  const textElement = elNS(['http://www.w3.org/2000/svg', 'text'], {
+    y: y - TEXT_OFFSET,
+    x: 10,
+    class: style.AxisYText
+  });
 
-  return elementsBaseArray.map((_, index) =>
-    createAxisElement(Math.round(cleanMax / ((5 - index) / 5)), index + 1, className)
-  );
+  textElement.textContent = text;
+  return [
+    textElement,
+    elNS(['http://www.w3.org/2000/svg', 'line'], {
+      y1: y,
+      y2: y,
+      x1: 10,
+      x2: x,
+      class: style.AxisYLine
+    })
+  ];
 };
-const elementsBaseArray = new Array(5).fill(0);
-const createAxisElement = (textContent, top, className) => {
-  const element = createElementWithClassName(`${style.AxisY}${className ? ' ' + className : ''}`);
-
-  element.style = `bottom:${90 * (top / 5)}%`;
-  element.textContent = textContent;
-  return element;
-};
+const FREE_LINES_COUNT = 5;
+const TEXT_OFFSET = 6;

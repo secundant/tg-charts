@@ -3,13 +3,20 @@ import { forEach } from '../../utils/fn';
 export function createRenderer() {
   const actions = new Map();
   const run = () => {
-    forEach(actions, exec);
-    actions.clear();
     requestAnimationFrame(run);
+    const prevActions = new Map(actions);
+
+    actions.clear();
+    forEach(prevActions, exec);
   };
 
   run();
-  return (type, fn) => actions.set(type, fn);
+  return (type, fn) => {
+    Object.defineProperty(fn, 'name', {
+      value: `renderer__${type}`
+    });
+    actions.set(type, fn);
+  };
 }
 
 const exec = fn => fn();

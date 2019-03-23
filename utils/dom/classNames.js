@@ -10,4 +10,3 @@ export const applyClassList = (element, className, method) => element.classList[
 export const setClassName = (element, className, add) =>
   applyClassList(element, className, add ? CLASS_LIST_METHOD_ADD : CLASS_LIST_METHOD_REMOVE);
 export const addClassName = (element, className) => applyClassList(element, className, CLASS_LIST_METHOD_ADD);
-export const removeClassName = (element, className) => applyClassList(element, className, CLASS_LIST_METHOD_REMOVE);

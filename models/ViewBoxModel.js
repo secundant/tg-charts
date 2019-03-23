@@ -11,9 +11,10 @@ export class ViewBoxModel extends Model {
    * @param {Number?} offset
    * @param {DataSource} dataSource
    * @param {number} padding
-   * @param {Transition} transition
+   * @param {number} paddingX
+   * @param transition
    */
-  constructor({ screen, height, visible = 30, offset = 60, dataSource, padding, transition }) {
+  constructor({ screen, height, visible = 30, offset = 60, dataSource, padding, transition, paddingX }) {
     super([screen, dataSource]);
     this._id = `view-box-${performance.now()}-${Math.random()}`;
     this.height = height;
@@ -21,14 +22,20 @@ export class ViewBoxModel extends Model {
     this.visible = visible;
     this.dataSource = dataSource;
     this.transition = transition;
+    this.paddingX = paddingX;
     this.screen = screen;
     this.padding = padding;
     this.innerHeight = height - padding * 2;
     this.prevMax = null;
     this.prevMin = null;
     this.update();
+    // @TODO join subscriptions into one
     transition.subscribe(this._id, value => {
       this.max = value;
+      this.emit();
+    });
+    transition.subscribe(this._id + '-min', value => {
+      this.min = value;
       this.emit();
     });
   }
@@ -43,8 +50,9 @@ export class ViewBoxModel extends Model {
     const {
       offset,
       visible,
-      screen: { width }
+      screen
     } = this;
+    const width = screen.width - this.paddingX;
     const scaledWidthRatio = 1 / (visible / 100);
     const scaledWidth = width * scaledWidthRatio;
     const offsetWidth = (scaledWidth * offset) / 100;
@@ -58,6 +66,8 @@ export class ViewBoxModel extends Model {
       return [Math.min.apply(Math, subset), Math.max.apply(Math, subset), subset];
       }
     );
+
+    if (!datas.length) return;
     const maxValue = Math.max.apply(Math, datas.map(v => v[1]));
     const minValue = Math.min.apply(Math, datas.map(v => v[0]));
 

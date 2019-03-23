@@ -6,12 +6,8 @@ const SYMBOLS_DEFAULT = 'abcdefghijklmnopqrstuvwxyz-_1235567890'.split('');
 
 function getGroup(index) {
   switch (+index) {
-    case 0:
-      return SYMBOLS_FIRST;
-    case 1:
-      return SYMBOLS_SECOND;
     default:
-      return SYMBOLS_DEFAULT;
+      return SYMBOLS_FIRST;
   }
 }
 

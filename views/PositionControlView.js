@@ -24,9 +24,11 @@ export function createPositionControlView(viewBox, draggable, renderer) {
     backdropRight.style.left = `${offsetLeft + controlWidth}px`;
   };
   const update = () => {
-    controlWidth = (screen.width * viewBox.visible) / 100;
-    offsetLeft = (screen.width * viewBox.offset) / 100;
-    offsetRight = screen.width - (controlWidth + offsetLeft);
+    const width = getWidth();
+
+    controlWidth = (width * viewBox.visible) / 100;
+    offsetLeft = (width * viewBox.offset) / 100;
+    offsetRight = width - (controlWidth + offsetLeft);
     renderer(id, paint);
   };
   const createHandler = exec => (type, abs, rel) => {
@@ -42,13 +44,14 @@ export function createPositionControlView(viewBox, draggable, renderer) {
       visible
     });
   };
+  const getWidth = () => screen.width - 20;
 
   viewBox.subscribe(update);
   draggable(
     controlLeft,
     createHandler(x => {
       const { visible, offset } = viewBox;
-      const { width } = screen;
+      const width = getWidth();
       const nextControlWidth = Math.min(Math.max(initial - x, 48), (width * (offset + visible)) / 100);
       const diff = ((nextControlWidth - controlWidth) * 100) / width;
 
@@ -58,7 +61,7 @@ export function createPositionControlView(viewBox, draggable, renderer) {
   draggable(
     controlRight,
     createHandler(x => {
-      const { width } = screen;
+      const width = getWidth();
       const nextWidth = Math.min(Math.max(initial + x, 48), width - offsetLeft);
 
       return [void 0, (nextWidth * 100) / width];
@@ -68,7 +71,7 @@ export function createPositionControlView(viewBox, draggable, renderer) {
     group,
     createHandler((_, x) => {
       const { visible } = viewBox;
-      const { width } = screen;
+      const width = getWidth();
       const nextOffsetLeft = Math.max(Math.min(offsetLeft + x, (width * (100 - visible)) / 100), 0);
 
       return [(nextOffsetLeft * 100) / width];

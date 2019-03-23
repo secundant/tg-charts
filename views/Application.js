@@ -1,4 +1,4 @@
-import { createDraggable, createRenderer, createTransition, ScreenModel } from '../models';
+import { createDraggable, createRenderer, createTransition, GlobalStateModel, ScreenModel } from '../models';
 import style from './style.scss';
 import { createElementWithClassName } from '../utils/dom/createElement';
 import { createRootView } from './RootView';
@@ -6,6 +6,7 @@ import { appendChild, applyClassList, CLASS_LIST_METHOD_TOGGLE, listen } from '.
 import { forEach } from '../utils/fn';
 
 export const createApplication = (target, input) => {
+  const globalState = new GlobalStateModel();
   const screen = new ScreenModel();
   const renderer = createRenderer();
   const draggable = createDraggable();
@@ -29,7 +30,7 @@ export const createApplication = (target, input) => {
   switchThemeElement.textContent = 'Switch theme';
   appendChild(target, applicationElement);
   forEach(input, dataSource =>
-    appendChild(applicationElement, createRootView(dataSource, renderer, transition, screen, draggable))
+    appendChild(applicationElement, createRootView(dataSource, renderer, transition, screen, draggable, globalState))
   );
 
   renderer('application-init', () => screen.update());

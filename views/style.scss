@@ -114,12 +114,33 @@ $graph-offset: 10px;
   z-index: 2;
 }
 
-.AxisX,
-.AxisY {
+.AxisX {
   font-size: 14px;
   letter-spacing: 0.5px;
   color: #888;
   position: absolute;
+  z-index: 1;
+}
+
+.AxisYText {
+  transition: get-transition-list($transition-time-regular, color fill);
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  color: #888;
+  fill: currentColor;
+}
+
+.AxisYLine {
+  transition: get-transition-list($transition-time-regular, stroke);
+  stroke: #eef1f5;
+}
+
+.AxisYContainer {
+  position: absolute;
+  top: 0;
+  left: $graph-offset;
+  right: 0;
+  bottom: 0;
   z-index: 1;
 }
 
@@ -135,21 +156,17 @@ $graph-offset: 10px;
   padding-bottom: $graph-offset / 2;
   border-bottom: 1px solid #eef1f5;
 
-  &.down {
+  &.up {
     transform: translateY(-100%);
     opacity: 0.01;
   }
-
-  &.up {
+  &.down {
     transform: translateY(100%);
     opacity: 0.01;
   }
 }
 
 .AxisXContainer {
-  height: 40px;
-  line-height: 40px;
-  margin-bottom: $offset-regular;
 }
 
 .AxisX {

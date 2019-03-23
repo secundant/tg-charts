@@ -7,7 +7,6 @@ export function createButtonsGroupElement() {
 }
 
 export function createButton(dataSet, renderer) {
-  console.log('Create button for', dataSet);
   const { color, title } = dataSet;
   const id = nextID();
 
