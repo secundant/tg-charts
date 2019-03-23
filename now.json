@@ -3,12 +3,11 @@
   "name": "telegram-charts",
   "builds": [
     {
-      "src": "index.server.js",
-      "use": "@now/node-server"
-    },
-    {
-      "src": "./static/",
-      "use": "@now/static"
+      "src": "package.json",
+      "use": "@now/static-build",
+      "config": {
+        "distDir": "static"
+      }
     }
   ]
 }
