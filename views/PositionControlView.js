@@ -1,6 +1,7 @@
 import style from './style.scss';
 import { createElementWithClassName } from '../utils/dom/createElement';
 import { nextID } from '../utils';
+import { profile, profileEnd, withProfile } from '../utils/profiler';
 
 export function createPositionControlView(viewBox, draggable, renderer) {
   let offsetLeft;
@@ -16,34 +17,36 @@ export function createPositionControlView(viewBox, draggable, renderer) {
   const controlRight = createElementWithClassName(style.ResizeControl);
   const group = createElementWithClassName(style.Group, [controlLeft, controlRight]);
   const element = createElementWithClassName(style.PositionControl, [backdropLeft, group, backdropRight]);
-  const paint = () => {
+  const paint = withProfile('PositionControlView.paint', () => {
     backdropLeft.style.width = `${offsetLeft}px`;
     group.style.width = `${controlWidth}px`;
     group.style.left = `${offsetLeft}px`;
     backdropRight.style.width = `${offsetRight}px`;
     backdropRight.style.left = `${offsetLeft + controlWidth}px`;
-  };
-  const update = () => {
+  });
+  const update = withProfile('PositionControlView.update', () => {
     const width = getWidth();
 
     controlWidth = (width * viewBox.visible) / 100;
     offsetLeft = (width * viewBox.offset) / 100;
     offsetRight = width - (controlWidth + offsetLeft);
     renderer(id, paint);
-  };
-  const createHandler = exec => (type, abs, rel) => {
+  });
+  const createHandler = exec => withProfile('PositionControl.handleDrag', (type, abs, rel) => {
     if (type === 'end') return;
     if (type === 'start') {
       initial = controlWidth;
       return;
     }
+    profile('PositionControlView.drag');
     const [offset, visible] = exec(abs, rel);
 
     viewBox.set({
       offset,
       visible
     });
-  };
+    profileEnd('PositionControlView.drag');
+  });
   const getWidth = () => screen.width - 20;
 
   viewBox.subscribe(update);

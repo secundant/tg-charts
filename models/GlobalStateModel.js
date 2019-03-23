@@ -3,16 +3,12 @@ import { Model } from './Model';
 export class GlobalStateModel extends Model {
   constructor() {
     super();
-    this.state = {
-      isDragging: false
-    };
+    this.theme = 'light';
   }
 
-  set(state) {
-    this.state = {
-      ...this.state,
-      ...state
-    };
+  setTheme(theme) {
+    if (theme === this.theme) return;
+    this.theme = theme;
     this.emit();
   }
 }

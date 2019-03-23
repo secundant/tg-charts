@@ -2,7 +2,12 @@ import { createApplication } from './views';
 import { listen } from './utils/dom';
 
 function main() {
-  createApplication(document.body, []);
+  fetch('/chart-data.json')
+    .then(result => result.json())
+    .then(input => {
+      console.log(input);
+      createApplication(document.body, [input[3]]);
+    });
 }
 
 if (document.readyState !== 'loading') main();

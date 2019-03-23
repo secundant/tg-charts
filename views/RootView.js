@@ -4,7 +4,7 @@ import { createElementWithClassName } from '../utils/dom/createElement';
 import { createButton } from './createButton';
 import { createSVGCanvasView } from './SVGCanvasView';
 import { createPositionControlView } from './PositionControlView';
-import { createAxisX } from './createAxisX';
+import { createTooltip } from './createTooltip';
 
 export function createRootView(input, renderer, transition, screen, draggable, globalState) {
   const dataSource = new DataSource(input);
@@ -14,7 +14,8 @@ export function createRootView(input, renderer, transition, screen, draggable, g
     height: 280,
     padding: 10,
     paddingX: 10,
-    transition
+    transition,
+    renderer
   });
   const previewViewBox = new ViewBoxModel({
     dataSource,
@@ -24,19 +25,16 @@ export function createRootView(input, renderer, transition, screen, draggable, g
     visible: 100,
     padding: 5,
     paddingX: 20,
-    transition
+    transition,
+    renderer
   });
+  const svg = createSVGCanvasView(dataSource, viewBox, renderer, transition);
 
   return createElementWithClassName(style.Root, [
     createElementWithClassName(style.Graph, [
-      createSVGCanvasView(dataSource, viewBox, renderer, transition)
+      svg,
+      createTooltip(svg, viewBox, renderer)
     ]),
-    createAxisX({
-      viewBox,
-      renderer,
-      transition,
-      globalState
-    }),
     createElementWithClassName(style.Preview, [
       createSVGCanvasView(dataSource, previewViewBox, renderer),
       createPositionControlView(viewBox, draggable, renderer)

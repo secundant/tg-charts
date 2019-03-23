@@ -1,4 +1,5 @@
 import { listen, subscribeToEvents } from '../utils/dom';
+import { profile, profileEnd } from '../utils/profiler';
 
 export function createDraggable() {
   let diff;
@@ -20,12 +21,14 @@ export function createDraggable() {
   };
   const change = event => {
     if (!currentElement) return;
+    profile('Draggable.change');
     const nextPageX = getPageX(event);
     const relativeDiff = nextPageX - lastPageX;
 
     lastPageX = nextPageX;
     diff = nextPageX - pageX;
     currentObserver('change', diff, relativeDiff);
+    profileEnd('Draggable.change');
   };
 
   subscribeToEvents(document, {
@@ -47,7 +50,7 @@ export function createDraggable() {
   }
 }
 
-const getPageX = event => {
+export const getPageX = event => {
   switch (event.type) {
     case 'touchstart':
     case 'touchmove':

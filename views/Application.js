@@ -2,7 +2,7 @@ import { createDraggable, createRenderer, createTransition, GlobalStateModel, Sc
 import style from './style.scss';
 import { createElementWithClassName } from '../utils/dom/createElement';
 import { createRootView } from './RootView';
-import { appendChild, applyClassList, CLASS_LIST_METHOD_TOGGLE, listen } from '../utils/dom';
+import { appendChild, listen, setClassName } from '../utils/dom';
 import { forEach } from '../utils/fn';
 
 export const createApplication = (target, input) => {
@@ -22,10 +22,15 @@ export const createApplication = (target, input) => {
     toNextInputElement
   ]);
   const applicationElement = createElementWithClassName(style.Application, [headerElement, appControlsElement]);
+  const paintTheme = () => {
+    setClassName(applicationElement, style.DarkTheme, globalState.theme === 'dark');
+    switchThemeElement.textContent = `Switch to ${globalState.theme === 'dark' ? 'Day' : 'Night'} Mode`;
+  };
 
-  listen(switchThemeElement, ['click'], () =>
-    applyClassList(applicationElement, style.DarkTheme, CLASS_LIST_METHOD_TOGGLE)
-  );
+  listen(switchThemeElement, ['click'], () => {
+    globalState.setTheme(globalState.theme === 'light' ? 'dark' : 'light');
+  });
+  globalState.subscribe(() => renderer('application-theme', paintTheme));
   titleElement.textContent = 'Followers';
   switchThemeElement.textContent = 'Switch theme';
   appendChild(target, applicationElement);

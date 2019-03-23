@@ -10,15 +10,15 @@ $graph-offset: 10px;
 
 .Heading {
   position: relative;
-  margin-bottom: $offset-small;
+  z-index: 3;
 
   &::after {
     content: '';
     display: block;
     width: 100%;
-    height: 0;
+    height: 2px;
     background-color: #fff;
-    box-shadow: 0 0 8px #fff;
+    box-shadow: 0 0 12px 4px #fff;
     transition: get-transition-list($transition-time-regular, background-color box-shadow);
   }
 
@@ -92,7 +92,6 @@ $graph-offset: 10px;
   margin-right: $graph-offset;
   height: 280px;
   margin-bottom: $graph-offset;
-  overflow: hidden;
   position: relative;
 }
 
@@ -114,6 +113,12 @@ $graph-offset: 10px;
   z-index: 2;
 }
 
+.AxisYText,
+.SVGLine {
+  will-change: opacity, transform;
+  transform: translateY(0);
+}
+
 .AxisX {
   font-size: 14px;
   letter-spacing: 0.5px;
@@ -125,14 +130,19 @@ $graph-offset: 10px;
 .AxisYText {
   transition: get-transition-list($transition-time-regular, color fill);
   font-size: 14px;
-  letter-spacing: 0.5px;
+  font-weight: 300;
   color: #888;
   fill: currentColor;
 }
 
-.AxisYLine {
+.SVGLine {
   transition: get-transition-list($transition-time-regular, stroke);
   stroke: #eef1f5;
+}
+
+.SVGCircle {
+  transition: get-transition-list($transition-time-regular, fill);
+  fill: #fff;
 }
 
 .AxisYContainer {
@@ -189,8 +199,54 @@ $graph-offset: 10px;
 .Line {
   opacity: 1;
   transition: $transition-time-regular opacity;
+  will-change: opacity;
 
   &.hidden {
     opacity: 0;
+  }
+}
+
+.Tooltip {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  transition: get-transition-list($transition-time-regular, box-shadow background-color);
+  box-shadow: 0 1px 3px #ccc;
+  padding: 5px;
+  background-color: #fff;
+  max-width: calc(100% - 20px);
+
+  > .TooltipTitle {
+    transition: get-transition-list($transition-time-regular, color);
+    color: #111;
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-size: 14px;
+    padding: 5px 5px 10px;
+    font-weight: 500;
+  }
+
+  > .TooltipContent {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    > .TooltipValueGroup {
+      padding: 5px;
+
+      > .TooltipValue {
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 20px;
+        color: inherit;
+      }
+      > .TooltipName {
+        font-weight: 400;
+        font-size: 13px;
+        line-height: 14px;
+        color: inherit;
+      }
+    }
   }
 }

@@ -1,26 +1,5 @@
 {
-  "presets": [
-    "next/babel"
-  ],
   "plugins": [
-    [
-      "module-resolver",
-      {
-        "root": [
-          "."
-        ],
-        "alias": {
-          "~": "."
-        }
-      }
-    ]
-  ],
-  "env": {
-    "production": {
-      "plugins": [
-        "babel-plugin-lodash",
-        "babel-plugin-ramda"
-      ]
-    }
-  }
+    "@babel/plugin-proposal-class-properties"
+  ]
 }

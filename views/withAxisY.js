@@ -1,83 +1,77 @@
 import style from './style.scss';
-import { flatten, forEach } from '../utils/fn';
+import { flatten, forEach, memoize } from '../utils/fn';
 import { nextID, prepend, removeChildren } from '../utils';
-import { attributesNS, elNS } from '../utils/dom/createElement';
+import { elNS } from '../utils/dom/createElement';
+import { withProfile } from '../utils/profiler';
 
 export function withAxisY(svg, renderer, transition, viewBox) {
   let currentMax = viewBox.prevMax;
   let currentMin = viewBox.prevMin;
   let currentList;
+  let previouslist;
   let currentFactor = 0;
   let prevWidth = viewBox.screen.width;
   let currentID;
   const axisID = nextID('withAxisY');
-  const itemHeight = (viewBox.height - 0) / (FREE_LINES_COUNT + 1);
+  const itemHeight = (viewBox.height - 50) / (FREE_LINES_COUNT + 1);
   const animation = new Set();
-  const y = (index, value) => {
-    const selfOffset = (1 + FREE_LINES_COUNT - index) * itemHeight;
+  const getY = memoize(index => (FREE_LINES_COUNT - index) * itemHeight);
 
-    return selfOffset + value * itemHeight;
-  };
-  const repaint = () => {
+  const repaint = withProfile('withAxisY.repaint', () => {
     if (!animation.size) return;
-    const value = transition.get(axisID + 'repaint', null);
+    let value = transition.get(axisID + 'repaint', null);
 
     forEach(animation, item => {
       const { list, factor, hasInit, isCurrent } = item;
 
-      if (value === null || ((value === 1 || value === 0) && hasInit)) {
+      if (value === null || (value === 1 && hasInit)) {
         animation.delete(item);
+        value = 1;
         if (!isCurrent) {
-          return removeChildren(svg, flatten(list));
+          return removeChildren(svg, list);
         }
       }
+      setTransform(list, factor * itemHeight * (isCurrent ? 1 - value : Math.min(value * 1.2, 1)), isCurrent ? value : 1 - (value * 2));
       item.hasInit = true;
-      forEach(list, ([text, line], index) => {
-        const realValue = value === null ? 0 : value;
-        const size = y(index + 1, realValue * factor);
-        const style = `opacity:${realValue < 0 ? 1 + realValue : 1 - realValue}`;
-
-        attributesNS(text, {
-          y: size - TEXT_OFFSET,
-          style
-        });
-        attributesNS(line, {
-          y1: size,
-          y2: size,
-          style
-        });
-      });
     });
-  };
-  const paint = () => {
+  });
+  const paint = withProfile('withAxisY.paint', () => {
     if (currentList) {
-      animation.add({
-        list: currentList,
-        factor: currentFactor
-      });
+      if (animation.size < 2) {
+        animation.add({
+          list: currentList,
+          factor: currentFactor * -1
+        });
+      } else {
+        removeChildren(svg, currentList);
+      }
     }
     currentID = nextID('axis-x');
-    currentList = Array.from({ length: FREE_LINES_COUNT }).map((_, index) => {
-      const cleanMax = currentMax - currentMin - (currentMax % 10);
-      const item = createLine(
-        prevWidth,
-        y(index, currentFactor),
-        Math.round(cleanMax / ((FREE_LINES_COUNT - index) / FREE_LINES_COUNT))
-      );
+    currentList = flatten(
+      Array.from({ length: FREE_LINES_COUNT }).map((_, index) => {
+        const cleanMax = currentMax - currentMin - (currentMax % 10);
+        const item = createLine(
+          prevWidth,
+          getY(index),
+          Math.round(cleanMax / ((FREE_LINES_COUNT - index) / FREE_LINES_COUNT))
+        );
 
-      prepend(svg, ...item);
-      return item;
-    });
+        setTransform(item, currentFactor * itemHeight, 0);
+        prepend(svg, ...item);
+        return item;
+      })
+    );
     animation.add({
       list: currentList,
       factor: currentFactor,
       isCurrent: true
     });
     transition.set(axisID + 'repaint', 0, 1);
-  };
+  });
   const update = () => {
-    const { prevMin, prevMax } = viewBox;
+    const { prevMin, prevMax, screen } = viewBox;
 
+    if (prevWidth !== screen) prevWidth = screen.width;
     if (prevMax === currentMax) return;
     currentFactor = prevMax > currentMax ? -1 : 1;
     currentMax = prevMax;
@@ -87,12 +81,17 @@ export function withAxisY(svg, renderer, transition, viewBox) {
 
   transition.subscribe(axisID + 'repaint', repaint);
   viewBox.subscribe(update);
-  prepend(svg, ...createLine(prevWidth, y(0, 0), 0));
+  prepend(svg, ...createLine(prevWidth, getY(-1), 0));
   paint();
 }
 
+const setTransform = (elements, value, opacity) =>
+  forEach(elements, element => {
+    element.style.transform = `translateY(${value}px)`;
+    element.style.opacity = opacity;
+  });
 const createLine = (x, y, text) => {
-  const textElement = elNS(['http://www.w3.org/2000/svg', 'text'], {
+  const textElement = elNS('text', {
     y: y - TEXT_OFFSET,
     x: 10,
     class: style.AxisYText
@@ -101,12 +100,13 @@ const createLine = (x, y, text) => {
   textElement.textContent = text;
   return [
     textElement,
-    elNS(['http://www.w3.org/2000/svg', 'line'], {
+    elNS('line', {
       y1: y,
       y2: y,
       x1: 10,
-      x2: x,
-      class: style.AxisYLine
+      x2: x - 10,
+      class: style.SVGLine,
+      'stroke-width': 1
     })
   ];
 };

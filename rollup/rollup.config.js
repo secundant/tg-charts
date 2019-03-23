@@ -1,5 +1,4 @@
 import resolve from 'rollup-plugin-node-resolve';
-import visualizer from 'rollup-plugin-visualizer';
 import progress from 'rollup-plugin-progress';
 import postcss from 'rollup-plugin-postcss';
 import replace from 'rollup-plugin-replace';
@@ -7,7 +6,6 @@ import babel from 'rollup-plugin-babel';
 import json from 'rollup-plugin-json';
 import { terser } from 'rollup-plugin-terser';
 import { createIdentNameGetter } from './IdentName';
-import compact from 'lodash/compact';
 
 const createTerser = () => terser({
   toplevel: true,
@@ -41,11 +39,11 @@ module.exports = {
   input: 'index.js',
   output: {
     name: 'bundle',
-    file: 'dist/bundle.js',
+    file: 'static/assets/bundle.js',
     format: 'iife',
     sourcemap: true
   },
-  plugins: compact([
+  plugins: [
     json(),
     resolve({ extensions: ['.js'] }),
     postcss({
@@ -59,16 +57,8 @@ module.exports = {
     replace({
       IS_CLIENT: 'true'
     }),
-    babel({
-      babelrc: false,
-      plugins: ['@babel/plugin-proposal-class-properties']
-    }),
+    babel(),
     progress(),
-    process.env.ANALYZE && visualizer({
-      filename: './dist/build.info.html',
-      sourcemap: true,
-      open: process.env.ANALYZE === 'open'
-    }),
     process.env.MINIFY && createTerser()
-  ])
+  ].filter(v => !!v)
 };

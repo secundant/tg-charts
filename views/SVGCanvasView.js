@@ -10,7 +10,7 @@ export function createSVGCanvasView(dataSource, viewBoxModel, renderer, transiti
   let viewBox = null;
 
   const id = nextID();
-  const svg = elNS(['http://www.w3.org/2000/svg', 'svg'], {
+  const svg = elNS('svg', {
     version: '1.1',
     baseProfile: 'full',
     width: viewBoxModel.screen.width,

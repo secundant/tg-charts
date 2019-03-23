@@ -63,8 +63,25 @@
       }
     }
 
-    .AxisYLine {
+    .Tooltip {
+      background-color: $color-dark-theme-bg;
+      box-shadow: 0 1px 3px darken($color-dark-theme-bg, 10%);
+
+      > .TooltipTitle {
+        color: #fff;
+      }
+    }
+
+    .AxisYText {
+      color: #aaa;
+    }
+
+    .SVGLine {
       stroke: #3b414b;
+    }
+
+    .SVGCircle {
+      fill: $color-dark-theme-bg;
     }
   }
 
