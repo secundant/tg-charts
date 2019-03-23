@@ -5,6 +5,10 @@
     {
       "src": "index.server.js",
       "use": "@now/node-server"
+    },
+    {
+      "src": "./static/",
+      "use": "@now/static"
     }
   ]
 }
