@@ -11,8 +11,6 @@ export const createApplication = (target, input) => {
   const renderer = createRenderer();
   const draggable = createDraggable();
   const transition = createTransition(renderer);
-  const titleElement = createElementWithClassName(style.Title, [], 'h1');
-  const headerElement = createElementWithClassName(style.Heading, [titleElement]);
   const toPrevInputElement = createElementWithClassName(style.Prev);
   const toNextInputElement = createElementWithClassName(style.Next);
   const switchThemeElement = createElementWithClassName(style.Switch);
@@ -21,7 +19,7 @@ export const createApplication = (target, input) => {
     switchThemeElement,
     toNextInputElement
   ]);
-  const applicationElement = createElementWithClassName(style.Application, [headerElement, appControlsElement]);
+  const applicationElement = createElementWithClassName(style.Application, [appControlsElement]);
   const paintTheme = () => {
     setClassName(applicationElement, style.DarkTheme, globalState.theme === 'dark');
     switchThemeElement.textContent = `Switch to ${globalState.theme === 'dark' ? 'Day' : 'Night'} Mode`;
@@ -31,11 +29,10 @@ export const createApplication = (target, input) => {
     globalState.setTheme(globalState.theme === 'light' ? 'dark' : 'light');
   });
   globalState.subscribe(() => renderer('application-theme', paintTheme));
-  titleElement.textContent = 'Followers';
   switchThemeElement.textContent = 'Switch theme';
   appendChild(target, applicationElement);
-  forEach(input, dataSource =>
-    appendChild(applicationElement, createRootView(dataSource, renderer, transition, screen, draggable, globalState))
+  forEach(input, (dataSource, index) =>
+    appendChild(applicationElement, createRootView(dataSource, renderer, transition, screen, draggable, `Chart #${index}`))
   );
 
   renderer('application-init', () => screen.update());

@@ -6,7 +6,7 @@ function main() {
     .then(result => result.json())
     .then(input => {
       console.log(input);
-      createApplication(document.body, [input[4]]);
+      createApplication(document.body, input);
     });
 }
 

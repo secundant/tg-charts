@@ -5,8 +5,9 @@ import { createButton } from './createButton';
 import { createSVGCanvasView } from './SVGCanvasView';
 import { createPositionControlView } from './PositionControlView';
 import { createTooltip } from './createTooltip';
+import { appendChildren } from '../utils/dom';
 
-export function createRootView(input, renderer, transition, screen, draggable, globalState) {
+export function createRootView(input, renderer, transition, screen, draggable, title) {
   const dataSource = new DataSource(input);
   const viewBox = new ViewBoxModel({
     dataSource,
@@ -31,19 +32,28 @@ export function createRootView(input, renderer, transition, screen, draggable, g
     renderer
   });
   const svg = createSVGCanvasView(dataSource, viewBox, renderer, transition);
+  const titleElement = createElementWithClassName(style.Title, [], 'h1');
+  const headerElement = createElementWithClassName(style.Heading, [titleElement]);
 
-  return createElementWithClassName(style.Root, [
-    createElementWithClassName(style.Graph, [
-      svg,
-      createTooltip(svg, viewBox, renderer)
-    ]),
-    createElementWithClassName(style.Preview, [
-      createSVGCanvasView(dataSource, previewViewBox, renderer),
-      createPositionControlView(viewBox, draggable, renderer)
-    ]),
-    createElementWithClassName(
-      style.ButtonsGroup,
-      Array.from(dataSource.dataSets.values()).map(dataSet => createButton(dataSet, renderer))
-    )
+  titleElement.textContent = title;
+  const fragment = document.createDocumentFragment();
+
+  appendChildren(fragment, [
+    headerElement,
+    createElementWithClassName(style.Root, [
+      createElementWithClassName(style.Graph, [
+        svg,
+        createTooltip(svg, viewBox, renderer)
+      ]),
+      createElementWithClassName(style.Preview, [
+        createSVGCanvasView(dataSource, previewViewBox, renderer),
+        createPositionControlView(viewBox, draggable, renderer)
+      ]),
+      createElementWithClassName(
+        style.ButtonsGroup,
+        Array.from(dataSource.dataSets.values()).map(dataSet => createButton(dataSet, renderer))
+      )
+    ])
   ]);
+  return fragment;
 }
