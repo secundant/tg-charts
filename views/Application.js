@@ -29,7 +29,7 @@ export const createApplication = (target, input) => {
     globalState.setTheme(globalState.theme === 'light' ? 'dark' : 'light');
   });
   globalState.subscribe(() => renderer('application-theme', paintTheme));
-  switchThemeElement.textContent = 'Switch theme';
+  paintTheme();
   appendChild(target, applicationElement);
   forEach(input, (dataSource, index) =>
     appendChild(applicationElement, createRootView(dataSource, renderer, transition, screen, draggable, `Chart #${index}`))
