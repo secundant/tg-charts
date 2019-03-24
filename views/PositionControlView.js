@@ -1,12 +1,8 @@
 import style from './style.scss';
 import { createElementWithClassName } from '../utils/dom/createElement';
 import { nextID } from '../utils';
+import { profile, profileEnd, withProfile } from '../utils/profiler';
 
-/**
- * @param {ViewBoxModel} viewBox
- * @param {Draggable} draggable
- * @param {Renderer} renderer
- */
 export function createPositionControlView(viewBox, draggable, renderer) {
   let offsetLeft;
   let offsetRight;
@@ -21,59 +17,64 @@ export function createPositionControlView(viewBox, draggable, renderer) {
   const controlRight = createElementWithClassName(style.ResizeControl);
   const group = createElementWithClassName(style.Group, [controlLeft, controlRight]);
   const element = createElementWithClassName(style.PositionControl, [backdropLeft, group, backdropRight]);
-  const paint = () => {
+  const paint = withProfile('PositionControlView.paint', () => {
     backdropLeft.style.width = `${offsetLeft}px`;
     group.style.width = `${controlWidth}px`;
     group.style.left = `${offsetLeft}px`;
     backdropRight.style.width = `${offsetRight}px`;
     backdropRight.style.left = `${offsetLeft + controlWidth}px`;
-  };
-  const update = () => {
-    controlWidth = (screen.width * viewBox.visible) / 100;
-    offsetLeft = (screen.width * viewBox.offset) / 100;
-    offsetRight = screen.width - (controlWidth + offsetLeft);
-    renderer.set(id, paint);
-  };
-  const createHandler = exec => (type, abs, rel) => {
+  });
+  const update = withProfile('PositionControlView.update', () => {
+    const width = getWidth();
+
+    controlWidth = (width * viewBox.visible) / 100;
+    offsetLeft = (width * viewBox.offset) / 100;
+    offsetRight = width - (controlWidth + offsetLeft);
+    renderer(id, paint);
+  });
+  const createHandler = exec => withProfile('PositionControl.handleDrag', (type, abs, rel) => {
     if (type === 'end') return;
     if (type === 'start') {
       initial = controlWidth;
       return;
     }
+    profile('PositionControlView.drag');
     const [offset, visible] = exec(abs, rel);
 
     viewBox.set({
       offset,
       visible
     });
-  };
+    profileEnd('PositionControlView.drag');
+  });
+  const getWidth = () => screen.width - 20;
 
   viewBox.subscribe(update);
-  draggable.subscribe(
+  draggable(
     controlLeft,
     createHandler(x => {
       const { visible, offset } = viewBox;
-      const { width } = screen;
+      const width = getWidth();
       const nextControlWidth = Math.min(Math.max(initial - x, 48), (width * (offset + visible)) / 100);
       const diff = ((nextControlWidth - controlWidth) * 100) / width;
 
       return [offset - diff, visible + diff];
     })
   );
-  draggable.subscribe(
+  draggable(
     controlRight,
     createHandler(x => {
-      const { width } = screen;
+      const width = getWidth();
       const nextWidth = Math.min(Math.max(initial + x, 48), width - offsetLeft);
 
       return [void 0, (nextWidth * 100) / width];
     })
   );
-  draggable.subscribe(
+  draggable(
     group,
     createHandler((_, x) => {
       const { visible } = viewBox;
-      const { width } = screen;
+      const width = getWidth();
       const nextOffsetLeft = Math.max(Math.min(offsetLeft + x, (width * (100 - visible)) / 100), 0);
 
       return [(nextOffsetLeft * 100) / width];

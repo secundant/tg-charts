@@ -1,55 +1,54 @@
-const TIME = 125;
+import { forEach } from '../../utils/fn';
+import { profile, profileEnd } from '../../utils/profiler';
 
-export class Transition {
-  /**
-   * @param {Renderer} renderer
-   */
-  constructor(renderer) {
-    this.items = new Map();
-    this.observers = new Map();
-    const register = () => renderer.set('transition', tick);
-    const tick = () => {
-      this.items.forEach((item, name) => {
-        const value = this.calc(name, item);
+const TIME = 175;
 
-        if (this.observers.has(name)) {
-          this.observers.get(name).forEach(observer => observer(value));
-        }
-      });
-      Promise.resolve().then(register);
-    };
+export function createTransition(renderer) {
+  let now = Date.now();
 
-    tick();
-  }
+  const items = new Map();
+  const cache = new Map();
+  const observers = new Map();
+  const register = () => renderer('transition', tick);
+  const tick = () => {
+    now = Date.now();
+    profile('Transition.tick');
+    for (const [name, item] of items) {
+      profile('Transition.tick.' + name);
+      const value = item[0] + item[1] * getCurrentValue(item[2], now);
+      const observersList = observers.get(name);
 
-  subscribe(name, observer) {
-    if (!this.observers.has(name)) {
-      this.observers.set(name, new Set([observer]));
-    } else {
-      this.observers.get(name).add(observer);
+      cache.set(name, value);
+      if (item[0] + item[1] === value) items.delete(name);
+      if (observersList) forEach(observersList, observer => observer(value));
+      profileEnd('Transition.tick.' + name);
     }
-  }
+    profileEnd('Transition.tick');
+    Promise.resolve().then(register);
+  };
 
-  calc(name, item = this.items.get(name)) {
-    const value = getCurrentValue(item);
-
-    if (item[1] === value) this.items.delete(name);
-    return value;
-  }
-
-  get(name, fallback) {
-    if (!this.items.has(name)) return fallback;
-    return this.calc(name);
-  }
-
-  /**
-   * @param {string} name
-   * @param {number} from
-   * @param {number} to
-   */
-  set(name, from, to) {
-    this.items.set(name, [from, to - from, Date.now()]);
-  }
+  tick();
+  return {
+    get(name, fallback) {
+      if (!items.has(name)) return fallback;
+      return cache.get(name) || items.get(name)[0];
+    },
+    set(name, from, to) {
+      items.set(name, [from, to - from, now]);
+    },
+    subscribe(name, observer) {
+      if (!observers.has(name)) {
+        observers.set(name, new Set([observer]));
+      } else {
+        observers.get(name).add(observer);
+      }
+    }
+  };
 }
 
-const getCurrentValue = ([from, diff, startedAt]) => from + (diff * Math.min(TIME, Date.now() - startedAt)) / TIME;
+const getCurrentValue = (startedAt, now) => {
+  const current = now - startedAt;
+  let value = (current > TIME ? TIME : current) / TIME - 1;
+
+  return value ** 3 + 1;
+};

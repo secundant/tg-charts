@@ -5,65 +5,29 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.4.0",
     "@babel/plugin-proposal-class-properties": "^7.3.4",
-    "@now/next": "0.0.84",
-    "@types/lodash": "^4.14.123",
-    "@types/next": "^8.0.1",
-    "@types/node": "^11.11.3",
-    "@types/ramda": "types/npm-ramda#dist",
-    "@types/react": "^16.8.8",
-    "@types/react-dom": "^16.8.2",
-    "@zeit/next-bundle-analyzer": "^0.1.2",
-    "@zeit/next-css": "^1.0.1",
-    "@zeit/next-sass": "^1.0.1",
-    "babel-eslint": "^10.0.1",
-    "babel-plugin-lodash": "^3.3.4",
     "babel-plugin-module-resolver": "^3.2.0",
-    "babel-plugin-ramda": "^2.0.0",
-    "eslint": "^5.15.1",
-    "eslint-plugin-jest": "^22.3.2",
-    "eslint-plugin-react": "^7.12.4",
-    "fork-ts-checker-webpack-plugin": "^1.0.0",
-    "jest": "^24.5.0",
-    "lint-staged": "^8.1.5",
-    "next-compose-plugins": "^2.1.1",
-    "next-progressbar": "^1.0.0",
+    "cross-env": "^5.2.0",
     "node-sass": "^4.11.0",
-    "prepack": "^0.2.54",
     "prettier": "^1.16.4",
     "rollup": "^1.6.0",
-    "rollup-plugin-analyzer": "^3.0.0",
     "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-graph": "^2.0.0",
     "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^4.0.1",
     "rollup-plugin-postcss": "^2.0.3",
     "rollup-plugin-progress": "^1.1.1",
     "rollup-plugin-replace": "^2.1.1",
-    "rollup-plugin-terser": "^4.0.4",
-    "rollup-plugin-visualizer": "^1.1.0"
-  },
-  "dependencies": {
-    "lodash": "^4.17.11",
-    "next": "^8.0.3",
-    "ramda": "^0.26.1",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4",
-    "sanitize.css": "^8.0.0"
+    "rollup-plugin-terser": "^4.0.4"
   },
   "scripts": {
-    "pre-commit": "lint-staged",
-    "lint": "eslint --fix",
-    "start-server": "next start",
-    "start": "next",
-    "build": "next build",
-    "now-build": "next build",
-    "build:rollup": "rollup --config rollup/rollup.config.js"
+    "now-build": "cross-env MINIFY=1 npm run build",
+    "start": "node index.server.js",
+    "build": "rollup --config rollup/rollup.config.js"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "post-commit": "git update-index --again"
-    }
+  "dependencies": {
+    "koa": "^2.7.0",
+    "koa-compress": "^3.0.0",
+    "koa-static": "^5.0.0"
   }
 }

@@ -3,19 +3,15 @@ import { LineModel } from '../models/LineModel';
 import { createLineView } from './LineView';
 import { attributesNS, elNS } from '../utils/dom/createElement';
 import { appendChild, nextID, setClassName } from '../utils';
+import { withAxisY } from './withAxisY';
+import { withAxisX } from './withAxisX';
 
-/**
- * @param {DataSource} dataSource
- * @param {ViewBoxModel} viewBoxModel
- * @param {Renderer} renderer
- * @param {number} [strokeWidth=2]
- */
-export function createSVGCanvasView(dataSource, viewBoxModel, renderer, strokeWidth = 2) {
+export function createSVGCanvasView(dataSource, viewBoxModel, renderer, transition, strokeWidth = 2) {
   let width = null;
   let viewBox = null;
 
   const id = nextID();
-  const svg = elNS(['http://www.w3.org/2000/svg', 'svg'], {
+  const svg = elNS('svg', {
     version: '1.1',
     baseProfile: 'full',
     width: viewBoxModel.screen.width,
@@ -33,8 +29,8 @@ export function createSVGCanvasView(dataSource, viewBoxModel, renderer, strokeWi
   const update = () => {
     if (viewBoxModel.screen.width === width) return;
     width = viewBoxModel.screen.width;
-    viewBox = `0 0 ${width} ${height}`;
-    renderer.set(id, paint);
+    viewBox = `0 0 ${width} ${viewBoxModel.height}`;
+    renderer(id, paint);
   };
   const handleDisabledChange = () => {
     const dataSet = dataSource.last;
@@ -56,6 +52,9 @@ export function createSVGCanvasView(dataSource, viewBoxModel, renderer, strokeWi
   dataSource.subscribe(handleDisabledChange);
   viewBoxModel.subscribe(update);
   update();
-
+  if (transition) {
+    withAxisX(svg, renderer, transition, viewBoxModel);
+    withAxisY(svg, renderer, transition, viewBoxModel);
+  }
   return svg;
 }

@@ -4,3 +4,4 @@ export * from './ViewBoxModel';
 export * from './LineModel';
 export * from './render';
 export * from './data';
+export * from './GlobalStateModel';

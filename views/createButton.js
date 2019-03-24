@@ -6,10 +6,6 @@ export function createButtonsGroupElement() {
   return createElementWithClassName(style.ButtonsGroup);
 }
 
-/**
- * @param {DataSet} dataSet
- * @param {Renderer} renderer
- */
 export function createButton(dataSet, renderer) {
   const { color, title } = dataSet;
   const id = nextID();
@@ -31,7 +27,7 @@ export function createButton(dataSet, renderer) {
     'button'
   );
   const paint = () => setClassName(element, style.checked, !dataSet.disabled);
-  const update = () => renderer.set(id, paint);
+  const update = () => renderer(id, paint);
 
   label.textContent = title;
   dataSet.subscribe(update);

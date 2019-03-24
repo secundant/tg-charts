@@ -8,6 +8,6 @@ export class ScreenModel extends Model {
   }
 
   update() {
-    this.width = document.body.offsetWidth - 20;
+    this.width = document.body.offsetWidth;
   }
 }

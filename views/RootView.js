@@ -1,26 +1,23 @@
 import style from './style.scss';
-import { DataSource, Draggable, Renderer, ScreenModel, Transition, ViewBoxModel } from '../models';
+import { DataSource, ViewBoxModel } from '../models';
 import { createElementWithClassName } from '../utils/dom/createElement';
 import { createButton } from './createButton';
 import { createSVGCanvasView } from './SVGCanvasView';
 import { createPositionControlView } from './PositionControlView';
-import { withAxisY } from './AxisYView';
+import { createTooltip } from './createTooltip';
+import { appendChildren } from '../utils/dom';
 
-/**
- * @param {Object} input
- * @param {Renderer} renderer
- * @param {Transition} transition
- * @param {ScreenModel} screen
- * @param {Draggable} draggable
- */
-export function createRootView(input, renderer, transition, screen, draggable) {
+export function createRootView(input, renderer, transition, screen, draggable, title) {
   const dataSource = new DataSource(input);
   const viewBox = new ViewBoxModel({
     dataSource,
     screen,
     height: 280,
-    padding: 10,
-    transition
+    paddingBottom: 25,
+    paddingY: 10,
+    paddingX: 10,
+    transition,
+    renderer
   });
   const previewViewBox = new ViewBoxModel({
     dataSource,
@@ -28,25 +25,35 @@ export function createRootView(input, renderer, transition, screen, draggable) {
     height: 60,
     offset: 0,
     visible: 100,
-    padding: 5,
-    transition
+    paddingBottom: 0,
+    paddingY: 5,
+    paddingX: 20,
+    transition,
+    renderer
   });
+  const svg = createSVGCanvasView(dataSource, viewBox, renderer, transition);
+  const titleElement = createElementWithClassName(style.Title, [], 'h1');
+  const headerElement = createElementWithClassName(style.Heading, [titleElement]);
 
-  return createElementWithClassName(style.Root, [
-    createElementWithClassName(style.Graph, [
-      withAxisY(createSVGCanvasView(dataSource, viewBox, renderer), {
-        viewBox,
-        renderer,
-        transition
-      })
-    ]),
-    createElementWithClassName(style.Preview, [
-      createSVGCanvasView(dataSource, previewViewBox, renderer),
-      createPositionControlView(viewBox, draggable, renderer)
-    ]),
-    createElementWithClassName(
-      style.ButtonsGroup,
-      Array.from(dataSource.dataSets.values()).map(dataSet => createButton(dataSet, renderer))
-    )
+  titleElement.textContent = title;
+  const fragment = document.createDocumentFragment();
+
+  appendChildren(fragment, [
+    headerElement,
+    createElementWithClassName(style.Root, [
+      createElementWithClassName(style.Graph, [
+        svg,
+        createTooltip(svg, viewBox, renderer)
+      ]),
+      createElementWithClassName(style.Preview, [
+        createSVGCanvasView(dataSource, previewViewBox, renderer),
+        createPositionControlView(viewBox, draggable, renderer)
+      ]),
+      createElementWithClassName(
+        style.ButtonsGroup,
+        Array.from(dataSource.dataSets.values()).map(dataSet => createButton(dataSet, renderer))
+      )
+    ])
   ]);
+  return fragment;
 }

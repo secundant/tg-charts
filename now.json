@@ -3,8 +3,11 @@
   "name": "telegram-charts",
   "builds": [
     {
-      "src": "next.config.js",
-      "use": "@now/next"
+      "src": "package.json",
+      "use": "@now/static-build",
+      "config": {
+        "distDir": "static"
+      }
     }
   ]
 }

@@ -1,17 +1,16 @@
-import { Draggable, Renderer, ScreenModel, Transition } from '../models';
+import { createDraggable, createRenderer, createTransition, GlobalStateModel, ScreenModel } from '../models';
 import style from './style.scss';
 import { createElementWithClassName } from '../utils/dom/createElement';
 import { createRootView } from './RootView';
-import { appendChild, applyClassList, CLASS_LIST_METHOD_TOGGLE, listen } from '../utils/dom';
+import { appendChild, listen, setClassName } from '../utils/dom';
 import { forEach } from '../utils/fn';
 
 export const createApplication = (target, input) => {
+  const globalState = new GlobalStateModel();
   const screen = new ScreenModel();
-  const renderer = new Renderer();
-  const draggable = new Draggable();
-  const transition = new Transition(renderer);
-  const titleElement = createElementWithClassName(style.Title, [], 'h1');
-  const headerElement = createElementWithClassName(style.Heading, [titleElement]);
+  const renderer = createRenderer();
+  const draggable = createDraggable();
+  const transition = createTransition(renderer);
   const toPrevInputElement = createElementWithClassName(style.Prev);
   const toNextInputElement = createElementWithClassName(style.Next);
   const switchThemeElement = createElementWithClassName(style.Switch);
@@ -20,17 +19,21 @@ export const createApplication = (target, input) => {
     switchThemeElement,
     toNextInputElement
   ]);
-  const applicationElement = createElementWithClassName(style.Application, [headerElement, appControlsElement]);
+  const applicationElement = createElementWithClassName(style.Application, [appControlsElement]);
+  const paintTheme = () => {
+    setClassName(applicationElement, style.DarkTheme, globalState.theme === 'dark');
+    switchThemeElement.textContent = `Switch to ${globalState.theme === 'dark' ? 'Day' : 'Night'} Mode`;
+  };
 
-  listen(switchThemeElement, ['click'], () =>
-    applyClassList(applicationElement, style.DarkTheme, CLASS_LIST_METHOD_TOGGLE)
-  );
-  titleElement.textContent = 'Followers';
-  switchThemeElement.textContent = 'Switch theme';
+  listen(switchThemeElement, ['click'], () => {
+    globalState.setTheme(globalState.theme === 'light' ? 'dark' : 'light');
+  });
+  globalState.subscribe(() => renderer('application-theme', paintTheme));
+  paintTheme();
   appendChild(target, applicationElement);
-  forEach(input, dataSource => appendChild(applicationElement, createRootView(
-    dataSource, renderer, transition, screen, draggable
-  )));
+  forEach(input, (dataSource, index) =>
+    appendChild(applicationElement, createRootView(dataSource, renderer, transition, screen, draggable, `Chart #${index}`))
+  );
 
-  renderer.set('application-init', () => screen.update());
+  renderer('application-init', () => screen.update());
 };

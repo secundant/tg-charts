@@ -5,6 +5,7 @@
 .Application {
   width: 100%;
   min-height: 100vh;
+  padding-bottom: 70px;
   background-color: #fff;
   transition: get-transition-list($transition-time-regular, background-color);
 
@@ -48,6 +49,40 @@
         color: #fff;
       }
     }
+
+    .PositionControl {
+      > .Backdrop {
+        background-color: rgba(25, 35, 51, 0.8);
+      }
+
+      > .Group {
+        border-color: $color-dark-theme-control;
+      }
+      .ResizeControl {
+        background-color: $color-dark-theme-control;
+      }
+    }
+
+    .Tooltip {
+      background-color: $color-dark-theme-bg;
+      box-shadow: 0 1px 3px darken($color-dark-theme-bg, 10%);
+
+      > .TooltipTitle {
+        color: #fff;
+      }
+    }
+
+    .AxisYText {
+      color: #aaa;
+    }
+
+    .SVGLine {
+      stroke: #3b414b;
+    }
+
+    .SVGCircle {
+      fill: $color-dark-theme-bg;
+    }
   }
 
   &:not(.DarkTheme) {
@@ -66,6 +101,7 @@
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 10;
     background-color: #fff;
     padding: $offset-small $offset-regular $offset-big;
     box-shadow: 0 0 8px #fff;
@@ -84,6 +120,8 @@
 
     > .Switch {
       font-size: 18px;
+      cursor: pointer;
+      user-select: none;
     }
   }
 }

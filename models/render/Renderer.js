@@ -1,18 +1,25 @@
-export class Renderer {
-  constructor() {
-    this.actions = new Map();
-    const run = () => {
-      this.actions.forEach(exec);
-      this.actions.clear();
-      requestAnimationFrame(run);
-    };
+import { profile, profileEnd } from '../../utils/profiler';
 
-    run();
-  }
+export function createRenderer() {
+  const actions = new Map();
+  const run = () => {
+    profile('Renderer');
+    requestAnimationFrame(run);
+    profile('Renderer.copy');
+    const prevActions = new Map(actions);
 
-  set(type, fn) {
-    this.actions.set(type, fn);
-  }
+    actions.clear();
+    profileEnd('Renderer.copy');
+    for (const [name, fn] of prevActions) {
+      profile('Renderer.' + name);
+      fn();
+      profileEnd('Renderer.' + name);
+    }
+    profileEnd('Renderer');
+  };
+
+  run();
+  return (type, fn) => actions.set(type, fn)
 }
 
 const exec = fn => fn();

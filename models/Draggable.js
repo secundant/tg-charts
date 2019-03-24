@@ -1,80 +1,60 @@
-import { Events } from './Events';
-import { subscribeToEvents } from '../utils/dom';
+import { listen, subscribeToEvents } from '../utils/dom';
+import { profile, profileEnd } from '../utils/profiler';
 
-export class Draggable extends Events {
-  constructor() {
-    super();
-    subscribeToEvents(document, {
-      resize: this.end,
-      blur: this.end,
-      touchmove: this.change,
-      mousemove: this.change,
-      touchend: this.end,
-      mouseup: this.end
-    });
-    this.elementObservers = new WeakMap();
-    this.reset();
-  }
+export function createDraggable() {
+  let diff;
+  let pageX;
+  let lastPageX;
+  let currentElement;
+  let currentObserver;
 
-  subscribe(element, observer) {
-    const handleStart = this.createStart(element);
-
-    this.elementObservers.set(element, observer);
-    subscribeToEvents(element, {
-      mousedown: handleStart,
-      touchstart: handleStart
-    });
-  }
-
-  change = event => {
-    if (!this.element) return;
-    const nextPageX = getPageX(event);
-    const lastDiff = nextPageX - this.lastPageX;
-
-    this.lastPageX = nextPageX;
-    this.diff = nextPageX - this.pageX;
-    this.emit('change', this.element, this.diff, lastDiff);
-    this.elementObservers.get(this.element)('change', this.diff, lastDiff);
-  };
-  end = event => {
-    if (!this.element) return;
-    if (event.type === 'touchend' && event.targetTouches.length > 0) {
+  const end = event => {
+    if (!currentElement) return;
+    if (event.type === 'touchend' && event.touches.length > 0) {
       return;
     }
-    this.emit('end', this.element);
-    this.elementObservers.get(this.element)('end');
-    this.reset();
+    currentObserver('end');
+    lastPageX = null;
+    currentElement = null;
+    pageX = null;
+    diff = null;
+  };
+  const change = event => {
+    if (!currentElement) return;
+    profile('Draggable.change');
+    const nextPageX = getPageX(event);
+    const relativeDiff = nextPageX - lastPageX;
+
+    lastPageX = nextPageX;
+    diff = nextPageX - pageX;
+    currentObserver('change', diff, relativeDiff);
+    profileEnd('Draggable.change');
   };
 
-  createStart(element) {
-    return event => {
-      if (this.element) return;
+  subscribeToEvents(document, {
+    'mouseup touchend resize blur': end,
+    'mousemove touchmove': change
+  });
+  return (element, observer) => {
+    listen(element, ['mousedown', 'touchstart'], event => {
+      if (currentElement) return;
       event.stopImmediatePropagation();
-      this.element = element;
-      this.pageX = getPageX(event);
-      this.lastPageX = this.pageX;
-      this.diff = 0;
-      this.emit('start', element);
-      this.elementObservers.get(this.element)('start');
-      if (event.type === 'touchstart') {
-        event.preventDefault();
-      }
-    };
-  }
-
-  reset() {
-    this.lastPageX = null;
-    this.element = null;
-    this.pageX = null;
-    this.diff = null;
+      event.preventDefault();
+      diff = 0;
+      pageX = getPageX(event);
+      lastPageX = pageX;
+      currentElement = element;
+      currentObserver = observer;
+      observer('start');
+    });
   }
 }
 
-const getPageX = event => {
+export const getPageX = event => {
   switch (event.type) {
     case 'touchstart':
     case 'touchmove':
-      return event.targetTouches[0].pageX;
+      return event.touches[0].pageX;
     case 'mousedown':
     case 'mousemove':
       return event.pageX;

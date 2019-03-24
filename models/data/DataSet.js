@@ -26,15 +26,6 @@ export class DataSet extends Model {
     this.disabled = disabled;
     this.next();
   }
-
-  /**
-   * @param {Number} from
-   * @param {Number} to
-   * @returns {Uint8Array | Uint16Array | Uint32Array}
-   */
-  subset(from, to) {
-    return this.data.subarray(from, to);
-  }
 }
 
 const getArrayConstructor = value => {
