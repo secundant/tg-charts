@@ -43,12 +43,20 @@ export function createTooltip(svg, viewBox, renderer) {
     })
   );
   const titleElement = createElementWithClassName(style.TooltipTitle);
-  const element = createElementWithClassName(style.Tooltip, [
-    titleElement,
-    createElementWithClassName(style.TooltipContent, arrayFrom(groups.values()).map(({ groupElement }) => groupElement))
-  ], 'div', {
-    style: 'display:none'
-  });
+  const element = createElementWithClassName(
+    style.Tooltip,
+    [
+      titleElement,
+      createElementWithClassName(
+        style.TooltipContent,
+        arrayFrom(groups.values()).map(({ groupElement }) => groupElement)
+      )
+    ],
+    'div',
+    {
+      style: 'display:none'
+    }
+  );
   const applyVisibility = ({ circle, groupElement }, name) => {
     const hidden = !isCurrentlyVisible || viewBox.dataSource.dataSets.get(name).disabled;
 
@@ -64,15 +72,13 @@ export function createTooltip(svg, viewBox, renderer) {
     if (!isCurrentlyVisible) return;
     const { width } = element.getBoundingClientRect();
     const index = viewBox.firstIndex + currentIndex;
-    const left = Math.floor(
-      Math.max(
-        10,
-        Math.min(
-          viewBox.screen.width - width - 10,
-          currentIndex * viewBox.space - (Math.max(width, 60) / 2) - 10
+    const left =
+      Math.floor(
+        Math.max(
+          10,
+          Math.min(viewBox.screen.width - width - 10, currentIndex * viewBox.space - Math.max(width, 60) / 2 - 10)
         )
-      )
-    ) + 'px';
+      ) + 'px';
 
     titleElement.textContent = viewBox.dataSource.legend[index].label;
     element.style.left = left;
@@ -105,11 +111,13 @@ export function createTooltip(svg, viewBox, renderer) {
       const pageX = getPageX(event);
       const visible = viewBox.lastIndex - viewBox.firstIndex;
 
-      currentIndex = Math.floor(visible * (pageX / (viewBox.screen.width - 10)));
-      if (event.type === 'touchstart') {
-        event.stopImmediatePropagation();
-        event.preventDefault();
-      }
+      currentIndex = Math.max(
+        viewBox.firstIndex === 0 ? 0 : 1,
+        Math.min(
+          Math.round(visible * (pageX / (viewBox.screen.width - 10))),
+          viewBox.dataSource.length - viewBox.firstIndex - 1
+        )
+      );
       if (!isCurrentlyVisible) {
         isCurrentlyVisible = true;
         renderer(id + '-visibility', paintVisibility);

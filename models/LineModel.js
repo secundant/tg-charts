@@ -39,11 +39,11 @@ export class LineModel extends Model {
 
   update() {
     if (!this.viewBox || (this.dataSet.disabled && !this.pending)) return;
-    const { firstIndex, lastIndex, initialX, xList } = this.viewBox;
+    const { firstIndex, lastIndex, initialX, xList, dataSource } = this.viewBox;
 
     this.pathDeclarationsList = new Array(lastIndex - firstIndex);
     this.pathDeclarationsList[0] = [`M${initialX} ${this.viewBox.y(this.dataSet.data[firstIndex])}`];
-    for (let index = firstIndex + 1; index <= lastIndex; index++) {
+    for (let index = firstIndex + 1; index <= Math.min(lastIndex + 1, dataSource.length - 1); index++) {
       this.pathDeclarationsList[index - firstIndex] = `L ${xList[index - (firstIndex + 1)]} ${this.viewBox.y(
         this.dataSet.data[index]
       )}`;

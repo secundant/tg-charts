@@ -9,6 +9,9 @@ export const withProfile = (name, fn) => (...args) => {
   profile(name);
   const result = fn(...args);
 
+  Object.defineProperty(fn, 'name', {
+    value: name
+  });
   profileEnd(name);
   return result;
 };

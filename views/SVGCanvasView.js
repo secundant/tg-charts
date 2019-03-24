@@ -4,6 +4,7 @@ import { createLineView } from './LineView';
 import { attributesNS, elNS } from '../utils/dom/createElement';
 import { appendChild, nextID, setClassName } from '../utils';
 import { withAxisY } from './withAxisY';
+import { withAxisX } from './withAxisX';
 
 export function createSVGCanvasView(dataSource, viewBoxModel, renderer, transition, strokeWidth = 2) {
   let width = null;
@@ -52,6 +53,7 @@ export function createSVGCanvasView(dataSource, viewBoxModel, renderer, transiti
   viewBoxModel.subscribe(update);
   update();
   if (transition) {
+    withAxisX(svg, renderer, transition, viewBoxModel);
     withAxisY(svg, renderer, transition, viewBoxModel);
   }
   return svg;

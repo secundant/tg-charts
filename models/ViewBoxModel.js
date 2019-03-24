@@ -5,7 +5,7 @@ import { createArray, nextID } from '../utils';
 export class ViewBoxModel extends Model {
   x = index => this.xList[index - (this.firstIndex + 1)];
   y = value =>
-    this.padding + Math.round(this.innerHeight - (this.innerHeight * (value - this.min)) / (this.max - this.min));
+    this.paddingY + Math.round(this.innerHeight - (this.innerHeight * (value - this.min)) / (this.max - this.min));
 
   /**
    * @param {ScreenModel} screen
@@ -13,12 +13,18 @@ export class ViewBoxModel extends Model {
    * @param {Number?} visible
    * @param {Number?} offset
    * @param {DataSource} dataSource
-   * @param {number} padding
    * @param {number} paddingX
+   * @param {number} paddingY
+   * @param {number} paddingBottom
    * @param transition
    * @param renderer
    */
-  constructor({ screen, height, visible = 30, offset = 60, dataSource, padding, transition, paddingX, renderer }) {
+  constructor({
+                screen, height, visible = 30, offset = 60, dataSource, transition, paddingX, renderer,
+
+                paddingBottom,
+                paddingY
+              }) {
     super([screen, dataSource]);
     this._id = nextID('view-box');
     this.height = height;
@@ -27,10 +33,11 @@ export class ViewBoxModel extends Model {
     this.renderer = renderer;
     this.dataSource = dataSource;
     this.transition = transition;
+    this.paddingBottom = paddingBottom;
     this.paddingX = paddingX;
+    this.paddingY = paddingY;
     this.screen = screen;
-    this.padding = padding;
-    this.innerHeight = height - padding * 2;
+    this.innerHeight = height - (paddingBottom + paddingY * 2);
     this.prevMax = null;
     this.prevMin = null;
     this.update();
@@ -84,7 +91,7 @@ export class ViewBoxModel extends Model {
     this.lastIndex = lastIndex;
     this.initialX = initialXPosition;
     this.space = spaceBetween;
-    this.xList = this.getXList(firstIndex, lastIndex);
+    this.xList = this.getXList(firstIndex, Math.min(lastIndex + 1, this.dataSource.length - 1));
     this.max = this.transition.get(this._id + '-max', this.prevMax || maxValue);
     this.min = this.transition.get(this._id + '-min', this.prevMin || minValue);
     if (maxValue !== this.prevMax) {

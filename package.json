@@ -21,9 +21,9 @@
     "rollup-plugin-terser": "^4.0.4"
   },
   "scripts": {
-    "now-build": "npm run build",
+    "now-build": "cross-env MINIFY=1 npm run build",
     "start": "node index.server.js",
-    "build": "cross-env MINIFY=1 rollup --config rollup/rollup.config.js"
+    "build": "rollup --config rollup/rollup.config.js"
   },
   "dependencies": {
     "koa": "^2.7.0",

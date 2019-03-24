@@ -12,7 +12,8 @@ export function createRootView(input, renderer, transition, screen, draggable, g
     dataSource,
     screen,
     height: 280,
-    padding: 10,
+    paddingBottom: 25,
+    paddingY: 10,
     paddingX: 10,
     transition,
     renderer
@@ -23,7 +24,8 @@ export function createRootView(input, renderer, transition, screen, draggable, g
     height: 60,
     offset: 0,
     visible: 100,
-    padding: 5,
+    paddingBottom: 0,
+    paddingY: 5,
     paddingX: 20,
     transition,
     renderer

@@ -5,9 +5,11 @@ export function createRenderer() {
   const run = () => {
     profile('Renderer');
     requestAnimationFrame(run);
+    profile('Renderer.copy');
     const prevActions = new Map(actions);
 
     actions.clear();
+    profileEnd('Renderer.copy');
     for (const [name, fn] of prevActions) {
       profile('Renderer.' + name);
       fn();

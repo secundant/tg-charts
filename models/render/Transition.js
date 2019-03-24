@@ -7,38 +7,31 @@ export function createTransition(renderer) {
   let now = Date.now();
 
   const items = new Map();
+  const cache = new Map();
   const observers = new Map();
   const register = () => renderer('transition', tick);
   const tick = () => {
     now = Date.now();
     profile('Transition.tick');
-    forEach(items, (item, name) => {
+    for (const [name, item] of items) {
       profile('Transition.tick.' + name);
-      const value = calc(name, item);
+      const value = item[0] + item[1] * getCurrentValue(item[2], now);
+      const observersList = observers.get(name);
 
-      if (observers.has(name)) {
-        forEach(observers.get(name), observer => observer(value));
-      }
+      cache.set(name, value);
+      if (item[0] + item[1] === value) items.delete(name);
+      if (observersList) forEach(observersList, observer => observer(value));
       profileEnd('Transition.tick.' + name);
-    });
+    }
     profileEnd('Transition.tick');
     Promise.resolve().then(register);
-  };
-  const calc = (name, item = items.get(name)) => {
-    profile('Transition.calc');
-    const value = getCurrentValue(item, now);
-
-    if (item[0] + item[1] === value) items.delete(name);
-    profileEnd('Transition.calc');
-    return value;
   };
 
   tick();
   return {
-    calc,
     get(name, fallback) {
       if (!items.has(name)) return fallback;
-      return calc(name);
+      return cache.get(name) || items.get(name)[0];
     },
     set(name, from, to) {
       items.set(name, [from, to - from, now]);
@@ -53,4 +46,9 @@ export function createTransition(renderer) {
   };
 }
 
-const getCurrentValue = ([from, diff, startedAt], now) => from + (diff * Math.min(TIME, now - startedAt)) / TIME;
+const getCurrentValue = (startedAt, now) => {
+  const current = now - startedAt;
+  let value = (current > TIME ? TIME : current) / TIME - 1;
+
+  return value ** 3 + 1;
+};

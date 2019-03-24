@@ -114,8 +114,9 @@ $graph-offset: 10px;
 }
 
 .AxisYText,
+.SVGText,
 .SVGLine {
-  will-change: opacity, transform;
+  will-change: opacity;
   transform: translateY(0);
 }
 
@@ -127,7 +128,7 @@ $graph-offset: 10px;
   z-index: 1;
 }
 
-.AxisYText {
+.SVGText {
   transition: get-transition-list($transition-time-regular, color fill);
   font-size: 14px;
   font-weight: 300;

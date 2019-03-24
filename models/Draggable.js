@@ -10,7 +10,7 @@ export function createDraggable() {
 
   const end = event => {
     if (!currentElement) return;
-    if (event.type === 'touchend' && event.targetTouches.length > 0) {
+    if (event.type === 'touchend' && event.touches.length > 0) {
       return;
     }
     currentObserver('end');
@@ -54,7 +54,7 @@ export const getPageX = event => {
   switch (event.type) {
     case 'touchstart':
     case 'touchmove':
-      return event.targetTouches[0].pageX;
+      return event.touches[0].pageX;
     case 'mousedown':
     case 'mousemove':
       return event.pageX;

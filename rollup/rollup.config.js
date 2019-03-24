@@ -11,10 +11,7 @@ const createTerser = () => terser({
   toplevel: true,
   mangle: {
     toplevel: true,
-    eval: true,
-    properties: {
-      reserved: ['class', 'renderer']
-    }
+    eval: true
   },
   compress: {
     toplevel: true,

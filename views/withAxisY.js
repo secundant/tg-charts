@@ -2,7 +2,7 @@ import style from './style.scss';
 import { flatten, forEach, memoize } from '../utils/fn';
 import { nextID, prepend, removeChildren } from '../utils';
 import { elNS } from '../utils/dom/createElement';
-import { withProfile } from '../utils/profiler';
+import { profile, profileEnd, withProfile } from '../utils/profiler';
 
 export function withAxisY(svg, renderer, transition, viewBox) {
   let currentMax = viewBox.prevMax;
@@ -13,7 +13,7 @@ export function withAxisY(svg, renderer, transition, viewBox) {
   let prevWidth = viewBox.screen.width;
   let currentID;
   const axisID = nextID('withAxisY');
-  const itemHeight = (viewBox.height - 50) / (FREE_LINES_COUNT + 1);
+  const itemHeight = (viewBox.height - viewBox.paddingBottom) / (FREE_LINES_COUNT + 1);
   const animation = new Set();
   const getY = memoize(index => (FREE_LINES_COUNT - index) * itemHeight);
 
@@ -21,7 +21,7 @@ export function withAxisY(svg, renderer, transition, viewBox) {
     if (!animation.size) return;
     let value = transition.get(axisID + 'repaint', null);
 
-    forEach(animation, item => {
+    forEach(animation, withProfile('withAxisY.animate', item => {
       const { list, factor, hasInit, isCurrent } = item;
 
       if (value === null || (value === 1 && hasInit)) {
@@ -31,9 +31,11 @@ export function withAxisY(svg, renderer, transition, viewBox) {
           return removeChildren(svg, list);
         }
       }
+      profile('withAxisY.setTransform');
       setTransform(list, factor * itemHeight * (isCurrent ? 1 - value : Math.min(value * 1.2, 1)), isCurrent ? value : 1 - (value * 2));
+      profileEnd('withAxisY.setTransform');
       item.hasInit = true;
-    });
+    }));
   });
   const paint = withProfile('withAxisY.paint', () => {
     if (currentList) {
@@ -46,7 +48,10 @@ export function withAxisY(svg, renderer, transition, viewBox) {
         removeChildren(svg, currentList);
       }
     }
+    const fragment = document.createDocumentFragment();
+
     currentID = nextID('axis-x');
+    profile('withAxisY.createNextLines');
     currentList = flatten(
       Array.from({ length: FREE_LINES_COUNT }).map((_, index) => {
         const cleanMax = currentMax - currentMin - (currentMax % 10);
@@ -57,16 +62,18 @@ export function withAxisY(svg, renderer, transition, viewBox) {
         );
 
         setTransform(item, currentFactor * itemHeight, 0);
-        prepend(svg, ...item);
+        prepend(fragment, ...item);
         return item;
       })
     );
+    profileEnd('withAxisY.createNextLines');
     animation.add({
       list: currentList,
       factor: currentFactor,
       isCurrent: true
     });
     transition.set(axisID + 'repaint', 0, 1);
+    prepend(svg, fragment);
   });
   const update = () => {
     const { prevMin, prevMax, screen } = viewBox;
@@ -94,7 +101,7 @@ const createLine = (x, y, text) => {
   const textElement = elNS('text', {
     y: y - TEXT_OFFSET,
     x: 10,
-    class: style.AxisYText
+    class: style.SVGText
   });
 
   textElement.textContent = text;
